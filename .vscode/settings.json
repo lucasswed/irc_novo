@@ -1,0 +1,8 @@
+{
+  "files.associations": {
+    "*html": "html",
+    "*njk": "html",
+    "*.css": "css",
+    "*.tcc": "cpp"
+  }
+}
