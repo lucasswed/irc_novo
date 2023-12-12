@@ -6,7 +6,7 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/20 16:39:01 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/12/12 19:25:39 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2023/12/12 19:49:17 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void Server::messageHandler(int socket, int read, char *buffer)
 	if (FD_ISSET(socket, &this->_masterFd))
 	{
 		// if (msg.find('\n') != std::string::npos) {
-		std::cout << GREEN << "message received: " << msg << WHITE <<std::endl;
+			std::cout << GREEN << "message received: " << msg << WHITE <<std::endl;
 		// }
 	}
 }
@@ -119,7 +119,6 @@ struct addrinfo *Server::setServerInfo(void)
 }
 
 int Server::bindSocket(struct addrinfo *server)
-https://prod.liveshare.vsengsaas.visualstudio.com/join?7BC850A25004441A3003640C2B5BB120DDFD
 {
 	int need = 1;
 

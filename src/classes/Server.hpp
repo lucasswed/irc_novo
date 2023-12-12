@@ -6,7 +6,7 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 19:46:22 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/11/21 16:59:57 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2023/12/12 19:29:00 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 
 #include <string>
 #include <cstring>
+#include <cstdlib>
 #include <iostream>
 
 #include <netdb.h>

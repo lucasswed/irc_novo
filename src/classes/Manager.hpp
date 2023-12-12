@@ -1,32 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Client.hpp                                         :+:      :+:    :+:   */
+/*   Manager.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/12 18:47:46 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/12/12 19:36:24 by lucas-ma         ###   ########.fr       */
+/*   Created: 2023/12/12 19:56:10 by lucas-ma          #+#    #+#             */
+/*   Updated: 2023/12/12 19:58:55 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CLIENT_HPP
-# define CLIENT_HPP
+#ifndef MANAGER_HPP
+# define MANAGER_HPP
 
-#include <string>
+#include "Client.hpp"
 
-class Client
+class Manager
 {
   private:
-    int _id;
-    std::string _username;
-    std::string _nickname;
-  public:
-    Client(int id);
-    ~Client(void);
-
-    void  init_client(std::string nickname, std::string username);
-};
+    static std::vector<Clients> _clients;
+    
+}
 
 
 #endif
