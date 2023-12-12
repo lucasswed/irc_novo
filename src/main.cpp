@@ -11,51 +11,62 @@
 /* ************************************************************************** */
 
 #include "irc.hpp"
+#include "Server.hpp"
 
-bool strIsNumber(std::string const& str) {
+bool strIsNumber(std::string const &str)
+{
 	size_t i = 0;
 
 	if (str[0] == '-' || str[0] == '+')
 		i++;
-	for (; str[i]; i++) {
+	for (; str[i]; i++)
+	{
 		if (!std::isdigit(str[i]))
 			return (false);
 	}
 	return (true);
 }
 
-bool check_errors(char **av) {
-	if (!strIsNumber(av[1])) {
+bool check_errors(char **av)
+{
+	if (!strIsNumber(av[1]))
+	{
 		std::cerr << "Port argument is not a number!" << std::endl;
 		return (false);
 	}
 
 	int port = std::atoi(av[1]);
-	if (port < 0 || port > MAX_PORT) {
-		//IPPORT_USERRESERVED
+	if (port < 0 || port > MAX_PORT)
+	{
+		// IPPORT_USERRESERVED
 		std::cerr << "Port outside of range!" << std::endl;
 		std::cerr << "The range is [0 , " << MAX_PORT << "]" << std::endl;
 		return (false);
 	}
 
 	std::string teste(av[2]);
-	if (teste.empty()) {
+	if (teste.empty())
+	{
 		std::cerr << "Empty password!" << std::endl;
 		return (false);
 	}
 
-	for (size_t i = 0; teste[i]; i++) {
-		if (std::isspace(teste[i])) {
+	for (size_t i = 0; teste[i]; i++)
+	{
+		if (std::isspace(teste[i]))
+		{
 			std::cerr << "The password must not contain spaces!" << std::endl;
 			return (false);
 		}
 	}
-	
+
 	return (true);
 }
 
-int main(int ac, char **av) {
-	if (ac != 3) {
+int main(int ac, char **av)
+{
+	if (ac != 3)
+	{
 		std::cerr << "Wrong arguments number!" << std::endl;
 		std::cerr << "Right usage: ./ircserv <port> <password>" << std::endl;
 		return (1);
@@ -63,4 +74,8 @@ int main(int ac, char **av) {
 
 	if (!check_errors(av))
 		return (1);
+	Server server(av[1], av[2]);
+
+	server.start();
+	return (0);
 }
