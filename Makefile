@@ -34,13 +34,14 @@ _SRC	=	src/
 _OBJ	=	obj/
 _LIB	=	libs/
 _BIN	=	./
+_CLASSES = $(_SRC)classes/
 
 ############### COMPILER ################
 
 CC		=	c++
 CFLAGS	=	-Wall -Werror -Wextra -std=c++98 -g -fsanitize=address
 #valgrind --leak-check=full --show-leak-kinds=all ./
-SRCS	=	$(_SRC)main.cpp
+SRCS	=	$(_SRC)main.cpp $(_CLASSES)Server.cpp
 OBJS	=	$(patsubst $(_SRC)%.cpp,$(_OBJ)%.o,$(SRCS))
 DEPS	=
 LIBS	=

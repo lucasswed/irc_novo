@@ -12,23 +12,26 @@
 
 #include "Server.hpp"
 
-void Server::messageHandler(int socket, int read, char *buffer) {
+void Server::messageHandler(int socket, int read, char *buffer)
+{
 	buffer[read] = 0;
 	std::string msg(buffer);
-	if (FD_ISSET(socket, &this->_masterFd)) {
-		if (msg.find('\n') != std::string::npos) {
-			
-		}
+	if (FD_ISSET(socket, &this->_masterFd))
+	{
+		// if (msg.find('\n') != std::string::npos) {
+		std::cout << GREEN << "message received: " << msg << WHITE <<std::endl;
+		// }
 	}
-
 }
 
-void Server::acceptConnection(void) {
-	int	newSocket;
+void Server::acceptConnection(void)
+{
+	int newSocket;
 	struct sockaddr_in clientAddress;
-	socklen_t	clientSize = sizeof(clientAddress);
+	socklen_t clientSize = sizeof(clientAddress);
 
-	if ((newSocket = accept(this->_serverFd, (struct sockaddr *)&clientAddress, &clientSize)) == -1) {
+	if ((newSocket = accept(this->_serverFd, (struct sockaddr *)&clientAddress, &clientSize)) == -1)
+	{
 		std::cerr << "Error accepting the client!" << std::endl;
 		exit(1);
 	}
@@ -38,17 +41,22 @@ void Server::acceptConnection(void) {
 	// add new client
 }
 
-void Server::checkActivity(fd_set readFd) {
+void Server::checkActivity(fd_set readFd)
+{
 	int readBytes;
 	char buffer[MAX_READ + 1];
 
-	for (int i = 0; i <= this->_maxFd ; i++) {
+	for (int i = 0; i <= this->_maxFd; i++)
+	{
 		bzero(buffer, MAX_READ + 1);
-		if (FD_ISSET(i, &readFd)) {
+		if (FD_ISSET(i, &readFd))
+		{
 			if (i == this->_serverFd)
 				this->acceptConnection();
-			else {
-				if ((readBytes = recv(i, buffer, sizeof(buffer), 0)) <= 0) {
+			else
+			{
+				if ((readBytes = recv(i, buffer, sizeof(buffer), 0)) <= 0)
+				{
 					// removeClient();
 					FD_CLR(i, &this->_masterFd);
 				}
@@ -59,16 +67,19 @@ void Server::checkActivity(fd_set readFd) {
 	}
 }
 
-void Server::connectionHandler(void) {
-	fd_set	readFd; // Temporary set of sockets used to check for activity
+void Server::connectionHandler(void)
+{
+	fd_set readFd; // Temporary set of sockets used to check for activity
 	this->_maxFd = this->_serverFd;
 
 	FD_ZERO(&this->_masterFd);
 	FD_SET(this->_serverFd, &this->_masterFd);
-	while (true) {
+	while (true)
+	{
 		readFd = this->_masterFd; // Copy the master socket to the temporary set thats going to read the activity
 		// wait until either socket has data ready to be recv()
-		if (select(this->_maxFd + 1, &readFd, NULL, NULL, NULL) == -1) {
+		if (select(this->_maxFd + 1, &readFd, NULL, NULL, NULL) == -1)
+		{
 			std::cerr << "Select function failed!" << std::endl;
 			exit(1);
 		}
@@ -76,12 +87,15 @@ void Server::connectionHandler(void) {
 	}
 }
 
-void Server::start(void) {
-	if (this->_serverFd == -1) {
+void Server::start(void)
+{
+	if (this->_serverFd == -1)
+	{
 		std::cerr << "Socket not inicialized!" << std::endl;
 		exit(1);
 	}
-	if (listen(this->_serverFd, PENDING) == -1) {
+	if (listen(this->_serverFd, PENDING) == -1)
+	{
 		std::cerr << "Listen function failed!" << std::endl;
 		exit(1);
 	}
@@ -89,24 +103,27 @@ void Server::start(void) {
 	this->connectionHandler();
 }
 
-struct addrinfo	*Server::setServerInfo(void) {
+struct addrinfo *Server::setServerInfo(void)
+{
 	int status = 0;
 	struct addrinfo temp;
 	struct addrinfo *ret;
 
 	bzero(&temp, sizeof(temp));
-	temp.ai_family = AF_UNSPEC; // Compatible with IP4 and IP6
+	temp.ai_family = AF_UNSPEC;			// Compatible with IP4 and IP6
 	temp.ai_socktype = SOCK_STREAM; // Receive and send type of connection
-	temp.ai_flags = AI_PASSIVE; // Automatically fills in ip
+	temp.ai_flags = AI_PASSIVE;			// Automatically fills in ip
 	if ((status = getaddrinfo(NULL, this->_port.c_str(), &temp, &ret)) != 0)
 		std::cerr << "getaddrinfo error: " << gai_strerror(status) << std::endl;
-	return (ret); 
+	return (ret);
 }
 
-int	Server::bindSocket(struct addrinfo *server) {
+int Server::bindSocket(struct addrinfo *server)
+{
 	int need = 1;
 
-	for (struct addrinfo *temp = server; temp; temp = temp->ai_next) {
+	for (struct addrinfo *temp = server; temp; temp = temp->ai_next)
+	{
 		int socket_fd = socket(temp->ai_family, temp->ai_socktype, temp->ai_protocol);
 		if (socket_fd == -1 || temp->ai_family != AF_INET6)
 			continue;
@@ -120,10 +137,13 @@ int	Server::bindSocket(struct addrinfo *server) {
 	return (-1);
 }
 
-Server::Server(std::string const& port, std::string const& password) : _port(port), _pass(password) {
+Server::Server(std::string const &port, std::string const &password) : _port(port), _pass(password)
+{
 	struct addrinfo *server;
 
 	server = setServerInfo();
 	_serverFd = this->bindSocket(server);
 	freeaddrinfo(server);
 }
+
+Server::~Server(void) {}

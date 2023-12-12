@@ -17,6 +17,8 @@
 #define FD_MAX 10
 #define MAX_READ 3500
 
+#include "../colors.hpp"
+
 #include <string>
 #include <cstring>
 #include <iostream>

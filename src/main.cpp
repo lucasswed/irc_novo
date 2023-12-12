@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "irc.hpp"
-#include "Server.hpp"
+#include "./classes/Server.hpp"
 
 bool strIsNumber(std::string const &str)
 {
