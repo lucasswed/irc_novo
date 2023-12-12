@@ -6,7 +6,7 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/20 16:39:01 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/12/12 19:49:17 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2023/12/12 23:15:23 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void Server::acceptConnection(void)
 	FD_SET(newSocket, &this->_masterFd);
 	if (newSocket > this->_serverFd)
 		this->_maxFd = newSocket + 1;
-	// add new client
+	Manager::addClient(newSocket);
 }
 
 void Server::checkActivity(fd_set readFd)
@@ -57,7 +57,7 @@ void Server::checkActivity(fd_set readFd)
 			{
 				if ((readBytes = recv(i, buffer, sizeof(buffer), 0)) <= 0)
 				{
-					// removeClient();
+					Manager::removeClient(i);
 					FD_CLR(i, &this->_masterFd);
 				}
 				else

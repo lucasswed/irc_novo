@@ -17,6 +17,6 @@
 #define LIGHTPURPLE "\033[1;35m"
 #define LIGHTCYAN "\033[1;36m"
 #define WHITE "\033[1;37m"
-#define GREY "\033[0m"
+#define RESET "\033[0m"
 
 #endif

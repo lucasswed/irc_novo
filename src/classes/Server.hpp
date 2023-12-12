@@ -6,7 +6,7 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 19:46:22 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/12/12 19:29:00 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2023/12/12 23:07:47 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #define MAX_READ 3500
 
 #include "../colors.hpp"
+#include "Manager.hpp"
 
 #include <string>
 #include <cstring>
