@@ -6,7 +6,7 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/20 16:39:01 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/11/21 17:00:31 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2023/12/12 19:25:39 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void Server::acceptConnection(void)
 	if ((newSocket = accept(this->_serverFd, (struct sockaddr *)&clientAddress, &clientSize)) == -1)
 	{
 		std::cerr << "Error accepting the client!" << std::endl;
-		exit(1);
+		std::exit(1);
 	}
 	FD_SET(newSocket, &this->_masterFd);
 	if (newSocket > this->_serverFd)
@@ -81,7 +81,7 @@ void Server::connectionHandler(void)
 		if (select(this->_maxFd + 1, &readFd, NULL, NULL, NULL) == -1)
 		{
 			std::cerr << "Select function failed!" << std::endl;
-			exit(1);
+			std::exit(1);
 		}
 		this->checkActivity(readFd);
 	}
@@ -92,12 +92,12 @@ void Server::start(void)
 	if (this->_serverFd == -1)
 	{
 		std::cerr << "Socket not inicialized!" << std::endl;
-		exit(1);
+		std::exit(1);
 	}
 	if (listen(this->_serverFd, PENDING) == -1)
 	{
 		std::cerr << "Listen function failed!" << std::endl;
-		exit(1);
+		std::exit(1);
 	}
 	std::cout << "Server listening on port " << this->_port << std::endl;
 	this->connectionHandler();
@@ -119,6 +119,7 @@ struct addrinfo *Server::setServerInfo(void)
 }
 
 int Server::bindSocket(struct addrinfo *server)
+https://prod.liveshare.vsengsaas.visualstudio.com/join?7BC850A25004441A3003640C2B5BB120DDFD
 {
 	int need = 1;
 

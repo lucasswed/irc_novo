@@ -6,7 +6,7 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 19:22:33 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/11/15 19:50:31 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2023/12/12 19:08:41 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ bool check_errors(char **av)
 		return (false);
 	}
 
-	int port = std::atoi(av[1]);
+	int port = atoi(av[1]);
 	if (port < 0 || port > MAX_PORT)
 	{
 		// IPPORT_USERRESERVED
