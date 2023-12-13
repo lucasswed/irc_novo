@@ -6,11 +6,29 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/20 16:39:01 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/12/12 23:15:23 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2023/12/13 09:55:48 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+
+bool Server::checkPassword(Client& client) {
+	if (client.getLogged())
+		return (true);
+	std::cout << BLUE << "Running password check..." << RESET << std::endl;
+	// check pass
+	if (!Manager::checkPassword(client, this->_pass))
+		return (false);
+	if (client.getNickname().empty() || client.getUsername().empty()) {
+		std::cout << BLUE << "Waiting for username and nickname..." << RESET << std::endl;
+		return (false);
+	}
+	// if ()
+	// verify username and nick
+	client.setLogged(true);
+	std::cout << GREEN << "Client correctly connected" << std::endl;
+	return (true);
+}
 
 void Server::messageHandler(int socket, int read, char *buffer)
 {
@@ -18,9 +36,18 @@ void Server::messageHandler(int socket, int read, char *buffer)
 	std::string msg(buffer);
 	if (FD_ISSET(socket, &this->_masterFd))
 	{
-		// if (msg.find('\n') != std::string::npos) {
-			std::cout << GREEN << "message received: " << msg << WHITE <<std::endl;
-		// }
+		std::vector<Client>::iterator iter = Manager::getClientByFd(socket);
+		Client& client = *iter;
+		if (msg.find('\n') == std::string::npos) {
+			client.temp += msg;
+			return ;
+		}
+		client.temp += msg;
+		client.cmd = ft_split(client.temp, "\r\n\t ");
+		// if (!Manager::checkClientData(client))
+			// this->checkPassword(client);
+		std::cout << GREEN << "Message received: " << client.temp << WHITE << std::endl;
+		client.temp.clear();
 	}
 }
 
