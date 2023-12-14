@@ -6,24 +6,32 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/20 16:39:01 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/12/13 09:55:48 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2023/12/14 13:32:47 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
-bool Server::checkPassword(Client& client) {
+bool Server::signUpClient(Client &client)
+{
 	if (client.getLogged())
 		return (true);
-	std::cout << BLUE << "Running password check..." << RESET << std::endl;
-	// check pass
-	if (!Manager::checkPassword(client, this->_pass))
-		return (false);
-	if (client.getNickname().empty() || client.getUsername().empty()) {
+	if (!client.getPassChecked())
+	{
+		std::cout << BLUE << "Running password check..." << RESET << std::endl;
+		// check pass
+		if (!Manager::checkPassword(client, this->_pass))
+			return (false);
+		client.setPassChecked(true);
+	}
+	std::cout << BLUE << "Running nickname and username check..." << RESET << std::endl;
+	if (client.getNickname().empty() || client.getUsername().empty())
+	{
 		std::cout << BLUE << "Waiting for username and nickname..." << RESET << std::endl;
 		return (false);
 	}
-	// if ()
+	if (!Manager::checkNick(client))
+		return (false);
 	// verify username and nick
 	client.setLogged(true);
 	std::cout << GREEN << "Client correctly connected" << std::endl;
@@ -37,16 +45,17 @@ void Server::messageHandler(int socket, int read, char *buffer)
 	if (FD_ISSET(socket, &this->_masterFd))
 	{
 		std::vector<Client>::iterator iter = Manager::getClientByFd(socket);
-		Client& client = *iter;
-		if (msg.find('\n') == std::string::npos) {
+		Client &client = *iter;
+		if (msg.find('\n') == std::string::npos)
+		{
 			client.temp += msg;
-			return ;
+			return;
 		}
 		client.temp += msg;
 		client.cmd = ft_split(client.temp, "\r\n\t ");
-		// if (!Manager::checkClientData(client))
-			// this->checkPassword(client);
 		std::cout << GREEN << "Message received: " << client.temp << WHITE << std::endl;
+		if (!Manager::checkClientData(client))
+			this->signUpClient(client);
 		client.temp.clear();
 	}
 }
@@ -137,9 +146,9 @@ struct addrinfo *Server::setServerInfo(void)
 	struct addrinfo *ret;
 
 	bzero(&temp, sizeof(temp));
-	temp.ai_family = AF_UNSPEC;			// Compatible with IP4 and IP6
+	temp.ai_family = AF_UNSPEC;		// Compatible with IP4 and IP6
 	temp.ai_socktype = SOCK_STREAM; // Receive and send type of connection
-	temp.ai_flags = AI_PASSIVE;			// Automatically fills in ip
+	temp.ai_flags = AI_PASSIVE;		// Automatically fills in ip
 	if ((status = getaddrinfo(NULL, this->_port.c_str(), &temp, &ret)) != 0)
 		std::cerr << "getaddrinfo error: " << gai_strerror(status) << std::endl;
 	return (ret);

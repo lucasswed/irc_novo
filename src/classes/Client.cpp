@@ -6,13 +6,13 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:24:38 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/12/13 09:53:14 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2023/12/14 13:29:10 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 
-Client::Client(int fd) : _fd(fd), _logged(false)
+Client::Client(int fd) : _fd(fd), _logged(false), _passChecked(false)
 {
 }
 
@@ -39,12 +39,19 @@ std::string Client::getPassword(void) const
   return (this->_password);
 }
 
-std::string Client::getUsername(void) const {
+std::string Client::getUsername(void) const
+{
   return (this->_username);
 }
 
-std::string Client::getNickname(void) const {
+std::string Client::getNickname(void) const
+{
   return (this->_nickname);
+}
+
+bool Client::getPassChecked(void) const
+{
+  return (this->_passChecked);
 }
 
 void Client::setLogged(bool value)
@@ -65,4 +72,9 @@ void Client::setUsername(std::string username)
 void Client::setPassword(std::string password)
 {
   this->_password = password;
+}
+
+void Client::setPassChecked(bool value)
+{
+  this->_passChecked = value;
 }

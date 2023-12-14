@@ -6,7 +6,7 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 19:46:22 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/12/13 09:29:24 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2023/12/14 13:22:54 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ private:
 	void acceptConnection(void);
 	void checkActivity(fd_set readFd);
 	void messageHandler(int socket, int read, char *buffer);
-	bool checkPassword(Client &client);
+	bool signUpClient(Client &client);
 
 public:
 	Server(std::string const &port, std::string const &password);
