@@ -6,13 +6,15 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:13:17 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/12/14 13:16:52 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2023/12/16 11:06:39 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Manager.hpp"
 
 std::vector<Client> Manager::_clients;
+std::string Manager::_hostname = "localhost";
+std::string Manager::_servername = "irc.server.com";
 
 bool Manager::addClient(int fd)
 {
@@ -68,7 +70,8 @@ bool Manager::checkPassword(Client const &client, std::string const &password)
   if (client.getPassword() != password || client.getPassword().empty())
   {
     std::cout << RED << "Wrong password or empty" << RESET << std::endl;
-    // sendMessage() to the client with the wrong password error
+    // sendMessage() to the client with the error
+    sendMessage(formatMessage(client, PASSWDMISMATCH) + ":Password required", client.getFd());
     return (false);
   }
   return (true);
@@ -95,4 +98,19 @@ bool Manager::checkNick(Client const &client)
   }
   std::cout << GREEN << "Nickname checked" << RESET << std::endl;
   return (true);
+}
+
+void Manager::sendMessage(std::string message, int clientFd)
+{
+  message += "\r\n";
+  std::cout << PURPLE << "sending message: " << message << RESET << std::endl;
+  if (send(clientFd, message.c_str(), message.length(), 0) == -1)
+  {
+    std::cerr << LIGHTRED << "Send function failed" << RESET << std::endl;
+    exit(1);
+  }
+}
+
+std::string Manager::formatMessage(Client const& client, std::string const& code) {
+  return (":" + _servername + " " + code + " " + client.getNickname());
 }
