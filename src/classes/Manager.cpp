@@ -6,7 +6,7 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:13:17 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/12/16 11:06:39 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2023/12/16 19:35:42 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ bool Manager::checkNick(Client const &client)
   {
     std::cout << RED << "Nickname wrong formatted" << RESET << std::endl;
     // sendMessage() to the client with the error nick not valid
+    sendMessage(formatMessage(client, ERRONEUSNICKNAME) + " :Erroneus nickname", client.getFd());
     return (false);
   }
   for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++)
@@ -93,6 +94,7 @@ bool Manager::checkNick(Client const &client)
     {
       std::cout << RED << "Nickname already in use" << RESET << std::endl;
       // sendMessage() to the client with the nick in use error
+      sendMessage(formatMessage(client, NICKNAMEINUSE) + " :Nickname is already in use", client.getFd());
       return (false);
     }
   }
