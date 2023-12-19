@@ -6,7 +6,7 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/20 16:39:01 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/12/14 13:32:47 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2023/12/19 13:38:20 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,14 @@ bool Server::signUpClient(Client &client)
 	return (true);
 }
 
+void Server::runCmd(Client const &client)
+{
+	std::string cmd = client.cmd[0];
+	if (client.cmd.size() == 0 || client.cmd[0].empty())
+		return ;
+	
+}
+
 void Server::messageHandler(int socket, int read, char *buffer)
 {
 	buffer[read] = 0;
@@ -53,9 +61,11 @@ void Server::messageHandler(int socket, int read, char *buffer)
 		}
 		client.temp += msg;
 		client.cmd = ft_split(client.temp, "\r\n\t ");
-		std::cout << GREEN << "Message received: " << client.temp << WHITE << std::endl;
+		std::cout << GREEN << "Message received: " << client.temp << RESET << std::endl;
 		if (!Manager::checkClientData(client))
 			this->signUpClient(client);
+		else
+			this->runCmd(client);
 		client.temp.clear();
 	}
 }
@@ -146,9 +156,9 @@ struct addrinfo *Server::setServerInfo(void)
 	struct addrinfo *ret;
 
 	bzero(&temp, sizeof(temp));
-	temp.ai_family = AF_UNSPEC;		// Compatible with IP4 and IP6
+	temp.ai_family = AF_UNSPEC;			// Compatible with IP4 and IP6
 	temp.ai_socktype = SOCK_STREAM; // Receive and send type of connection
-	temp.ai_flags = AI_PASSIVE;		// Automatically fills in ip
+	temp.ai_flags = AI_PASSIVE;			// Automatically fills in ip
 	if ((status = getaddrinfo(NULL, this->_port.c_str(), &temp, &ret)) != 0)
 		std::cerr << "getaddrinfo error: " << gai_strerror(status) << std::endl;
 	return (ret);

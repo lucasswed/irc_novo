@@ -6,7 +6,7 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:13:17 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/12/16 19:35:42 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2023/12/19 13:43:00 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,26 @@
 std::vector<Client> Manager::_clients;
 std::string Manager::_hostname = "localhost";
 std::string Manager::_servername = "irc.server.com";
+
+void  Manager::on(std::string event, cmdFunction function) {
+  cmdMap.insert(std::pair<std::string, cmdFunction>(event, function));
+}
+
+void  Manager::fillCmdMap(void) {
+  // on("JOIN", &);
+  // on("QUIT", &);
+  // on("KICK", &);
+  // on("PART", &);
+  // on("MODE", &);
+  // on("TOPIC", &);
+  // on("INVITE", &);
+  // on("PRIVMSG", &);
+  // on("LIST", &);
+  // on("NAMES", &);
+  // on("WHO", &);
+  // on("LUSERS", &);
+  // on("NICK", &);
+}
 
 bool Manager::addClient(int fd)
 {
@@ -71,7 +91,7 @@ bool Manager::checkPassword(Client const &client, std::string const &password)
   {
     std::cout << RED << "Wrong password or empty" << RESET << std::endl;
     // sendMessage() to the client with the error
-    sendMessage(formatMessage(client, PASSWDMISMATCH) + ":Password required", client.getFd());
+    sendMessage(formatMessage(client, PASSWDMISMATCH) + " :Password required", client.getFd());
     return (false);
   }
   return (true);
@@ -113,6 +133,10 @@ void Manager::sendMessage(std::string message, int clientFd)
   }
 }
 
-std::string Manager::formatMessage(Client const& client, std::string const& code) {
-  return (":" + _servername + " " + code + " " + client.getNickname());
+std::string Manager::formatMessage(Client const &client, std::string const &code)
+{
+  if (!client.getNickname().empty())
+    return (":" + _hostname + " " + code + " " + client.getNickname());
+  else
+    return (":" + _hostname + " " + code + " " + "teste");
 }
