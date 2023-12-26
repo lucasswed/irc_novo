@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:24:38 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/12/20 15:26:26 by ralves-g         ###   ########.fr       */
+/*   Updated: 2023/12/26 17:11:27 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,14 +77,4 @@ void Client::setPassword(std::string password)
 void Client::setPassChecked(bool value)
 {
   this->_passChecked = value;
-}
-
-  //Cenas que eu (Ricardo) tou a meter
-
-void Client::setOperator(bool value) {
-	_operator = value;
-}
-
-bool Client::isOperator(void) {
-	return (_operator);
 }
