@@ -6,7 +6,7 @@
 /*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:24:38 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/12/26 17:11:27 by pcampos-         ###   ########.fr       */
+/*   Updated: 2023/12/27 14:59:10 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,11 @@ std::string Client::getNickname(void) const
   return (this->_nickname);
 }
 
+std::vector<std::string> Client::getCmd() const
+{
+	return (this->_cmd);
+}
+
 bool Client::getPassChecked(void) const
 {
   return (this->_passChecked);
@@ -77,4 +82,10 @@ void Client::setPassword(std::string password)
 void Client::setPassChecked(bool value)
 {
   this->_passChecked = value;
+}
+
+void Client::setCmd(std::vector<std::string> cmd)
+{
+  this->_cmd.clear();
+  this->_cmd = cmd;
 }

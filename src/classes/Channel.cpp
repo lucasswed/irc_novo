@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 16:52:20 by ralves-g          #+#    #+#             */
-/*   Updated: 2023/12/20 15:28:42 by ralves-g         ###   ########.fr       */
+/*   Updated: 2023/12/27 15:53:17 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,15 +28,86 @@ Channel::~Channel() {
 	;
 }
 
+std::string Channel::getName() const
+{
+	return (this->_name);
+}
+
+std::string Channel::getKey() const
+{
+	return (this->_key);
+}
+
+int Channel::getClientLimit() const
+{
+	return (this->_clientLimit);
+}
+
 std::vector<Client> Channel::getMembers() const {
-	return (_members);
+	return (this->_members);
 }
 
 std::vector<Client> Channel::getOperators() const {
-	return (_operators);
+	return (this->_operators);
 }
 
-int	Channel::addMember(Client newClient) {
+std::vector<Client> Channel::getInvited() const
+{
+	return (this->_invited);
+}
+
+std::map<std::string, bool> Channel::getModes() const
+{
+	return (this->_modes);
+}
+
+std::string Channel::getTopic() const
+{
+	return (this->_topic);
+}
+
+void Channel::setName(std::string name)
+{
+	this->_name = name;
+}
+
+void Channel::setKey(std::string key)
+{
+	this->_key = key;
+}
+
+void Channel::setClientLimit(int limit)
+{
+	this->_clientLimit = limit;
+}
+
+void Channel::setMembers(std::vector<Client> members)
+{
+	this->_members = members;
+}
+
+void Channel::setOperators(std::vector<Client> operators)
+{
+	this->_operators = operators;
+}
+
+void Channel::setInvited(std::vector<Client> invited)
+{
+	this->_invited = invited;
+}
+
+void Channel::setMode(std::map<std::string, bool> modes)
+{
+	this->_modes = modes;
+}
+
+void Channel::setTopic(std::string topic)
+{
+	this->_topic = topic;
+}
+
+/*
+bool	Channel::addClient(Client &client) {
 	if (_members.empty())
 	{
 		_members.push_back(newClient);
@@ -97,5 +168,4 @@ int	Channel::isOperator(Client check) {
 	}
 	return false;
 }
-
-
+*/

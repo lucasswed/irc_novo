@@ -6,7 +6,7 @@
 /*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 16:52:15 by ralves-g          #+#    #+#             */
-/*   Updated: 2023/12/26 17:10:47 by pcampos-         ###   ########.fr       */
+/*   Updated: 2023/12/27 15:54:30 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,14 @@ class Channel {
 		Channel(Channel const& ref);
 		Channel const& operator=(Channel const& ref);
 		
-		std::string			_name;
-		std::string			_key;
+		std::string					_name;
+		std::string					_key;
 		int							_clientLimit;
-		std::vector<Client>	_members;
-		std::vector<Client>	_operators;
-		std::vector<Client>	_invited;
+		std::vector<Client>			_members;
+		std::vector<Client>			_operators;
+		std::vector<Client>			_invited;
 		std::map<std::string, bool>	_modes;
-		std::string			_topic;
+		std::string					_topic;
 
 	public:
 		Channel(std::string name);
@@ -52,14 +52,16 @@ class Channel {
 		void setName(std::string name);
 		void setKey(std::string key);
 		void setClientLimit(int limit);
-		void setMember(Client &client);
-		void setOperator(Client &client);
-		void setInvited(Client &client);
-		void setMode(std::string mode);
+		void setMembers(std::vector<Client> members);
+		void setOperators(std::vector<Client> operators);
+		void setInvited(std::vector<Client> invited);
+		void setModes(std::map<std::string, bool> modes);
 		void setTopic(std::string topic);
 
-		void kickClient(Client Client);
-		bool isOperator(Client Client);
+		void addClient(Client &client);
+		void kickClient(Client &client);
+		bool isOperator(Client &client);
+		void changeMode(std::string mode);
 };
 
 #endif
