@@ -6,7 +6,7 @@
 /*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 16:52:15 by ralves-g          #+#    #+#             */
-/*   Updated: 2024/01/02 16:14:44 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/02 16:20:55 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ class Channel {
 		std::vector<int> getOperators() const;
 		std::vector<int> getInvited() const;
 		int getMode(std::string mode) const;
+		std::map<std::string, bool> getModes() const;
 		std::string getTopic() const;
 		bool isMember(int client);
 		bool isOperator(int Client);
@@ -58,33 +59,21 @@ class Channel {
 		void setName(std::string name);
 		void setKey(std::string key);
 		void setClientLimit(int limit);
-		void addMembers(std::vector<int> members);
-		void addOperators(std::vector<int> operators);
-		void Invite(std::vector<int> invited);
-		void setModes(std::map<std::string, bool> mode, bool flags);
-		void setTopic(std::string topic);
-
-		void addClient(Client &client);
-		void kickClient(Client &client);
-		bool isOperator(Client &client);
-		void changeMode(std::string mode);
-
 		void addMember(int client);
-		void Channel::addMember(int client);
+		void addMembers(std::vector<int> members);
 		void addOperator(int client);
+		void addOperators(std::vector<int> operators);
 		void Invite(int client);
+		void Invites(std::vector<int> invited);
+		void changeMode(std::string mode);
+		void setModes(std::map<std::string, bool> mode, bool flags);
 		void setTopic(std::string topic);
 		void setMode(std::string mode, bool flag);
 		void kickClient(int client);
-		bool isOperator(int client);
-		void changeMode(std::string mode);
-		
+
+		//msgs
 		void messageAll(std::string msg);
 		void messageAll(std::string msg, int senderFd);
-		void addClient(Client client);
-		void kickClient(Client client);
-		bool isOperator(Client client);
-		void changeMode(std::string mode);
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/01/02 16:06:37 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/02 17:10:49 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ public:
 	static void fillCmdMap(void);
 
 	void createChannel(std::string name);
-	void joinChannel(std::string channel, std::string key, Client &client);
+	void joinChannel(std::string channel, std::string key, Client client);
 	std::vector<Channel>::iterator getChnlByName(std::string name);
 	int getFdByNick(std::string nickname);
 	std::string getNickByFd(int fd);

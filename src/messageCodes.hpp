@@ -6,7 +6,7 @@
 /*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/16 10:27:02 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/02 15:14:56 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/02 17:13:43 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@
 #define RPL_LIST "322"
 #define RPL_LISTEND "323"
 #define CHANNELMODEIS "324"
-#define TOPIC_CHANNEL "332"
+#define RPL_NOTOPIC "331"
+#define RPL_TOPIC "332"
 #define INVITING "341"
 #define RPL_WHOREPLY "352"
 #define NAMREPLY "353"

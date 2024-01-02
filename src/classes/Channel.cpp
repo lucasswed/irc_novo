@@ -6,7 +6,7 @@
 /*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 16:52:20 by ralves-g          #+#    #+#             */
-/*   Updated: 2024/01/02 16:07:50 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/02 16:24:11 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,15 +43,15 @@ int Channel::getClientLimit() const
 	return (this->_clientLimit);
 }
 
-std::vector<Client> Channel::getMembers() const {
+std::vector<int> Channel::getMembers() const {
 	return (this->_members);
 }
 
-std::vector<Client> Channel::getOperators() const {
+std::vector<int> Channel::getOperators() const {
 	return (this->_operators);
 }
 
-std::vector<Client> Channel::getInvited() const
+std::vector<int> Channel::getInvited() const
 {
 	return (this->_invited);
 }
@@ -81,17 +81,17 @@ void Channel::setClientLimit(int limit)
 	this->_clientLimit = limit;
 }
 
-void Channel::setMembers(std::vector<Client> members)
+void Channel::addMembers(std::vector<int> members)
 {
 	this->_members = members;
 }
 
-void Channel::setOperators(std::vector<Client> operators)
+void Channel::addOperators(std::vector<int> operators)
 {
 	this->_operators = operators;
 }
 
-void Channel::setInvited(std::vector<Client> invited)
+void Channel::Invites(std::vector<int> invited)
 {
 	this->_invited = invited;
 }
@@ -100,48 +100,6 @@ void Channel::setTopic(std::string topic)
 {
 	this->_topic = topic;
 }
-
-bool	Channel::addClient(Client &client) {
-	if (_members.empty())
-	{
-		_members.push_back(newClient);
-		return SUCCESS;
-	}
-	for (std::vector<Client>::iterator itr = _members.begin(); itr != _members.end(); itr++)
-	{
-		if (itr->getFd() == newClient.getFd() 
-			|| itr->getUsername() == newClient.getUsername()
-			|| itr->getNickname() == newClient.getNickname())
-			return FAILURE;
-	}
-	_members.push_back(newClient);
-	return SUCCESS;
-}
-
-int	Channel::addOperator(Client newOP) {
-	this->addMember(newOP);
-	if (_members.empty())
-		return FAILURE;
-	for (std::vector<Client>::iterator itr = _members.begin(); itr != _members.end(); itr++)
-	{
-		if (itr->getFd() == newOP.getFd())
-		{
-			_operators.push_back(newOP);
-			if (!itr->isOperator())
-			{
-				itr->setOperator(true);
-				return SUCCESS;
-			}
-			else
-			{
-				//msg user ja e um operator
-				return FAILURE;
-			}
-		}
-	}
-	return FAILURE;
-}
-*/
 
 int Channel::getMode(std::string mode) const {
 	return (_modes.find("mode") != _modes.end() ? _modes.find("mode")->second : -1);
@@ -212,16 +170,16 @@ void Channel::kickClient(int client) {
 
 void Channel::messageAll(std::string msg)
 {
-	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++)
-		Manager::sendMessage(msg, it->getFd());
+	for (std::vector<int>::iterator it = _members.begin(); it != _members.end(); it++)
+		Manager::sendMessage(msg, *it);
 }
 
 void Channel::messageAll(std::string msg, int senderFd)
 {
-	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++)
+	for (std::vector<int>::iterator it = _members.begin(); it != _members.end(); it++)
 	{
-		if (it->getFd() == senderFd)
+		if (*it == senderFd)
 			continue;
-		Manager::sendMessage(msg, it->getFd());
+		Manager::sendMessage(msg, *it);
 	}
 }

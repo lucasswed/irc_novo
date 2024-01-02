@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Manager.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:13:17 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/02 15:43:32 by pcampos-         ###   ########.fr       */
+/*   Updated: 2024/01/02 18:14:50 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,6 +158,40 @@ std::vector<Channel>::iterator Manager::getChnlByName(std::string name) {
 	return (itr);
 }
 
+int	Manager::getFdByNick(std::string nickname) {
+	std::vector<Client>::iterator itr;
+	for (itr = _clients.begin(); itr != _clients.end(); itr++)
+	{
+		if (nickname == itr->getNickname())
+			break;
+	}
+	return (itr != _clients.end() ? itr->getFd() : -1);
+}
+
+std::string Manager::getNickByFd(int fd) {
+	std::vector<Client>::iterator itr;
+	for (itr = _clients.begin(); itr != _clients.end(); itr++)
+	{
+		if (fd == itr->getFd())
+			break;
+	}
+	return (itr != _clients.end() ? itr->getNickname() : "");
+}
+
+std::vector<Channel>::iterator Manager::getChnlByName(std::string name) {
+	std::vector<Channel>::iterator itr;
+	for (itr = _channels.begin(); itr != _channels.end(); itr++)
+	{
+		if (name == itr->getName())
+			break;
+	}
+	return (itr);
+}
+
+void Manager::createChannel(std::string name) {
+	_channels.push_back(Channel(name));
+}
+
 void Manager::topicCmd(Client &client)
 {
 	std::vector<std::string> cmd = client.getCmd();
@@ -181,13 +215,13 @@ void Manager::topicCmd(Client &client)
 		}
 		else
 		{
-			sendMessage(formatMessage(client, TOPIC_CHANNEL) + " " + cmd[1] + " :" + channelIt->getTopic(), client.getFd());
+			sendMessage(formatMessage(client, RPL_TOPIC) + " " + cmd[1] + " :" + channelIt->getTopic(), client.getFd());
 			return;
 		}
 	}
 	else
 	{
-		if (channelIt->getMode("t") && !channelIt->isOperator(client))
+		if (channelIt->getMode("t") && !channelIt->isOperator(client.getFd()))
 		{
 			sendMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + cmd[1] + " :You're not channel operator", client.getFd());
 			return;
@@ -195,7 +229,176 @@ void Manager::topicCmd(Client &client)
 		else
 		{
 			channelIt->setTopic(cmd[2]);
-			channelIt->messageAll(formatMessage(client, TOPIC_CHANNEL) + " " + cmd[1] + " :" + channelIt->getTopic());
+			channelIt->messageAll(formatMessage(client, RPL_TOPIC) + " " + cmd[1] + " :" + channelIt->getTopic());
 		}
+	}
+}
+
+void Manager::joinChannel(std::string channel, std::string key, Client client) {
+ 	std::vector<Channel>::iterator itr = getChnlByName(channel);
+	if (itr == _channels.end())
+	{
+		createChannel(channel);
+		return ;
+	}
+	if (itr->getMode("INVITE") == 1)
+	{
+		if (!itr->isInvited(client.getFd()))
+		{
+			sendMessage(formatMessage(client, INVITEONLYCHAN) + " " + channel + " :Cannot join channel (+i)", client.getFd());
+			return ;
+		}
+	}
+	if (itr->getMode("KEY") && key != itr->getKey())
+	{
+		sendMessage(formatMessage(client, BADCHANNELKEY) + " " + channel + " :Cannot join channel (+k)", client.getFd());
+		return ;
+	}
+	if (itr->getMode("LIMIT") && itr->getMembers().size() >= itr->getClientLimit())
+	{
+		itr->addMember(client.getFd());
+		sendMessage(formatMessage(client, "Successfully joined " + channel), client.getFd());
+		if (getChnlByName(channel)->getMode("t") == 1)
+			sendMessage(formatMessage(client, RPL_TOPIC) + " " + channel + " :No topic is set", client.getFd());
+		else
+			sendMessage(formatMessage(client, RPL_NOTOPIC) + " " + channel + " :" + getChnlByName(channel)->getTopic(), client.getFd());
+	}
+	else
+	{
+		sendMessage(formatMessage(client, CHANNELISFULL) + " " + channel + " :Cannot join channel (+l)", client.getFd());
+		return ;
+	}
+}
+
+void Manager::joinCmd(Client &client) {
+	std::vector<std::string> channels = ft_split(client.getCmd()[1], ",");
+
+	if (channels.size() == 1 && channels[0] == "0")
+	{
+		for (int i, i2 = 0; i < _channels.size(); i++)
+			_channels[i].kickClient(client.getFd());
+		return ;
+	}
+	std::vector<std::string> keys = ft_split(client.getCmd()[2], ",");
+	std::vector<Channel>::iterator c_itr;
+
+	if (channels.size() < keys.size())
+	{
+		sendMessage(formatMessage(client, "Error: too many keys for the number of channels"), client.getFd()); //to check
+		return ;
+	}
+	for (int i, i2 = 0; i < channels.size(); i++)
+	{
+		if (getChnlByName(channels[i])->getMode("KEY") && i2 == keys.size())
+		{
+			sendMessage(formatMessage(client, "Error: not enough keys for the number of key protected channels"), client.getFd()); //to check
+			return ;
+		}
+		joinChannel(channels[i], keys[i], client);
+		if (getChnlByName(channels[i])->getMode("KEY"))
+			i2++;
+	}
+}
+
+void Manager::quitCmd(Client &client) {
+	for (int i, i2 = 0; i < _channels.size(); i++)
+		_channels[i].kickClient(client.getFd());
+	sendMessage(formatMessage(client, "Quit: Gone to have lunch"), client.getFd());
+}
+
+void Manager::kickCmd(Client &client) {
+	std::vector<std::string> tokens = client.getCmd();
+	if (tokens.size() != 3 && tokens.size() != 4)
+	{
+		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " " + client.getCmd()[0] + " :Not enough parameters", client.getFd());
+		return ;
+	}
+	if (getChnlByName(tokens[0]) == _channels.end())
+	{
+		sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + tokens[0] + " :No such channel", client.getFd());
+		return ;
+	}
+	if (!getChnlByName(tokens[0])->isInvited(client.getFd()))
+	{
+		sendMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + tokens[0] + " :You're not channel operator", client.getFd());
+		return ;
+	}
+	//multiple channels and users
+	// std::vector<std::string> channels = ft_split(tokens[0], ",");
+	// std::vector<std::string> clients = ft_split(tokens[1], ",");
+	// if (channels.size() != clients.size() && channels.size() != 1)
+	// {
+	// 	sendMessage(formatMessage(client, NEEDMOREPARAMS) + " " + client.getCmd()[0] + " :Not enough parameters", client.getFd());
+	// 	return ;
+	// }
+	// if (channels.size() == 1)
+	// {
+	// 	for (int i = 0; i < clients.size(); i++)
+	// 		getChnlByName(channels[0])->kickClient(getFdByNick(clients[i]));
+	// 		//send message 
+	// 	return ;
+	// }
+	getChnlByName(tokens[0])->kickClient(getFdByNick(tokens[1]));
+}
+
+void Manager::inviteCmd(Client &client) {
+	if (client.getCmd().size() != 3)
+	{
+		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " " + client.getCmd()[0] + " :Not enough parameters", client.getFd());
+		return ;
+	}
+	if (getFdByNick(client.getCmd()[1]) == -1)
+	{
+		sendMessage(formatMessage(client, NOSUCHNICK) + " " + client.getCmd()[1] + " :No such nick/channel", client.getFd());
+		return ;
+	}
+	if (getChnlByName(client.getCmd()[2]) == _channels.end())
+	{
+		sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + client.getCmd()[2] + " :No such channel", client.getFd());
+		return ;
+	}
+	if (getChnlByName(client.getCmd()[2])->isMember(getFdByNick(client.getCmd()[1])))
+	{
+		sendMessage(formatMessage(client, ERR_USERONCHANNEL) + " " + client.getCmd()[1] + " " + client.getCmd()[2] + " :is already on channel", client.getFd());
+		return ;
+	}
+	if (getChnlByName(client.getCmd()[2])->getMode("INVITED") && !(getChnlByName(client.getCmd()[2])->isOperator(client.getFd())))
+	{
+		sendMessage(formatMessage(client, INVITEONLYCHAN) + " " + client.getCmd()[2] + " :Cannot join channel (+i)", client.getFd());
+		return ;
+	}
+	getChnlByName(client.getCmd()[2])->Invite(getFdByNick(client.getCmd()[1]));
+	sendMessage(formatMessage(client, INVITING) + " " + client.getCmd()[2] + " " + client.getCmd()[1], client.getFd());
+}
+
+void Manager::partCmd(Client &client) {
+	if (client.getCmd().size() != 2)
+	{
+		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " " + client.getCmd()[0] + " :Not enough parameters", client.getFd());
+		return ;
+	}
+	std::vector<std::string> channels = ft_split(client.getCmd()[1], " ");
+	for (int i = 0; i < channels.size(); i++)
+	{
+		if (getChnlByName(channels[i]) == _channels.end())
+			sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + channels[i] + " :No such channel", client.getFd());
+		else if (!getChnlByName(channels[i])->isMember(client.getFd()))
+			sendMessage(formatMessage(client, USERNOTINCHANNEL) + " " + client.getNickname() + " " + channels[i] + " :They aren't on that channel", client.getFd());
+		else
+		{
+			getChnlByName(channels[i])->kickClient(client.getFd());
+			//msg
+		}
+	}
+}
+
+void Manager::privmsgCmd(Client& client) {
+	if (client.getCmd().size() < 2)
+	{
+		
+	}
+	if (client.getCmd().size() < 3)
+	{
+		
 	}
 }
