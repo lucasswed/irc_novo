@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/29 14:50:19 by ralves-g          #+#    #+#             */
-/*   Updated: 2024/01/02 12:10:46 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/02 12:35:55 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void Manager::createChannel(std::string name) {
 }
 
 void Manager::joinChannel(std::string channel, std::string key, Client& client) {
- 	std::vector<Channel>::iterator itr = getChnlByName(channel);
+	std::vector<Channel>::iterator itr = getChnlByName(channel);
 	if (itr == _channels.end())
 	{
 		createChannel(channel);

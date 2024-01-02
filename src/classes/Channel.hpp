@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 16:52:15 by ralves-g          #+#    #+#             */
-/*   Updated: 2024/01/02 12:15:10 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/02 15:41:18 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 # include <vector>
 # include <string>
 # include <map>
+# include "Manager.hpp"
 
 class Client;
 
@@ -30,7 +31,7 @@ class Channel {
 		int							_clientLimit;
 
 		//change users to FDs!!!
-		std::vector<Client>	_members;
+		std::vector<Client>	_clients;
 		std::vector<Client>	_operators;
 		std::vector<Client>	_invited;
 		std::map<std::string, bool>	_modes;
@@ -50,7 +51,6 @@ class Channel {
 		int getMode(std::string mode) const;
 		std::string getTopic() const;
 		bool isMember(Client client);
-		bool isOperator(Client Client);
 		bool isInvited(Client Client);
 
 		//setters
@@ -63,9 +63,11 @@ class Channel {
 		void setModes(std::map<std::string, bool> mode, bool flags);
 		void setTopic(std::string topic);
 
-		void addClient(Client &client);
-		void kickClient(Client &client);
-		bool isOperator(Client &client);
+		void messageAll(std::string msg);
+		void messageAll(std::string msg, int senderFd);
+		void addClient(Client client);
+		void kickClient(Client client);
+		bool isOperator(Client client);
 		void changeMode(std::string mode);
 };
 

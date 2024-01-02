@@ -6,7 +6,7 @@
 /*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/20 16:39:01 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/02 11:52:29 by pcampos-         ###   ########.fr       */
+/*   Updated: 2024/01/02 12:43:34 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void Server::runCmd(Client const &client)
 	std::string cmd = client.getCmd()[0];
 	if (client.getCmd().size() == 0 || client.getCmd()[0].empty())
 		return ;
-	Manager::getCmdMap()[cmd];
+	Manager::getCmdMap()[cmd](client);
 }
 
 void Server::messageHandler(int socket, int read, char *buffer)

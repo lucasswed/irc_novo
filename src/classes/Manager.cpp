@@ -6,7 +6,7 @@
 /*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:13:17 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/02 11:54:39 by pcampos-         ###   ########.fr       */
+/*   Updated: 2024/01/02 15:43:32 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void Manager::fillCmdMap(void)
 	// on("KICK", &);
 	// on("PART", &);
 	// on("MODE", &);
-	// on("TOPIC", &);
+	on("TOPIC", &Manager::topicCmd);
 	// on("INVITE", &);
 	// on("PRIVMSG", &);
 	// on("LIST", &);
@@ -146,4 +146,56 @@ std::string Manager::formatMessage(Client const &client, std::string const &code
 std::map<std::string, cmdFunction> Manager::getCmdMap(void)
 {
 	return (_cmdMap);
+}
+
+std::vector<Channel>::iterator Manager::getChnlByName(std::string name) {
+	std::vector<Channel>::iterator itr;
+	for (itr = _channels.begin(); itr != _channels.end(); itr++)
+	{
+		if (toUP(name) == toUP(itr->getName()))
+			break;
+	}
+	return (itr);
+}
+
+void Manager::topicCmd(Client &client)
+{
+	std::vector<std::string> cmd = client.getCmd();
+	if (cmd.size() < 2)
+	{
+		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " COMMAND ERROR: Not enought paramaters", client.getFd());
+		return ;
+	}
+	std::vector<Channel>::iterator channelIt = getChnlByName(cmd[1]);
+	if (channelIt == _channels.end())
+	{
+		sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + cmd[1] + " :No such channel", client.getFd());
+		return;
+	}
+	if (cmd.size() < 3)
+	{
+		if (channelIt->getTopic().empty())
+		{
+			sendMessage(formatMessage(client, "331") + " " + cmd[1] + " :No topic is set", client.getFd());
+			return;
+		}
+		else
+		{
+			sendMessage(formatMessage(client, TOPIC_CHANNEL) + " " + cmd[1] + " :" + channelIt->getTopic(), client.getFd());
+			return;
+		}
+	}
+	else
+	{
+		if (channelIt->getMode("t") && !channelIt->isOperator(client))
+		{
+			sendMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + cmd[1] + " :You're not channel operator", client.getFd());
+			return;
+		}
+		else
+		{
+			channelIt->setTopic(cmd[2]);
+			channelIt->messageAll(formatMessage(client, TOPIC_CHANNEL) + " " + cmd[1] + " :" + channelIt->getTopic());
+		}
+	}
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 16:52:20 by ralves-g          #+#    #+#             */
-/*   Updated: 2024/01/02 12:16:30 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/02 15:39:48 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,6 @@ void Channel::setTopic(std::string topic)
 	this->_topic = topic;
 }
 
-/*
 bool	Channel::addClient(Client &client) {
 	if (_members.empty())
 	{
@@ -167,19 +166,6 @@ bool Channel::isInvited(Client client) {
 			return true;
 	return false;
 }
-*/void Channel::addMember(Client &client) {
-	if (!isMember(client))
-		_members.push_back(client);
-}
-
-void Channel::addOperator(Client &client) {
-	if (!isOperator(client))
-		_operators.push_back(client);
-}
-void Channel::Invite(Client &client) {
-	if (!isInvited(client))
-		_invited.push_back(client);
-}
 
 void Channel::setTopic(std::string topic) {
 	_topic = topic;
@@ -205,3 +191,18 @@ void Channel::kickClient(Client client) {
 				_members.erase(itr);
 }
 
+void Channel::messageAll(std::string msg)
+{
+	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++)
+		Manager::sendMessage(msg, it->getFd());
+}
+
+void Channel::messageAll(std::string msg, int senderFd)
+{
+	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++)
+	{
+		if (it->getFd() == senderFd)
+			continue;
+		Manager::sendMessage(msg, it->getFd());
+	}
+}

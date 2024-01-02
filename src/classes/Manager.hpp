@@ -3,13 +3,12 @@
 /*                                                        :::      ::::::::   */
 /*   Manager.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/01/02 12:12:45 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/02 14:09:44 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #ifndef MANAGER_HPP
 #define MANAGER_HPP
@@ -27,16 +26,16 @@
 #include <unistd.h>
 #include <sys/socket.h>
 
-typedef void  (*cmdFunction)(std::string& msg, Client& client);
+typedef void (*cmdFunction)(Client &client);
 
 class Manager
 {
 private:
-  static std::vector<Client> _clients;
-  static std::vector<Channel> _channels;
-  static std::string _hostname;
-  static std::string _servername;
-  static std::map<std::string, cmdFunction> cmdMap;
+	static std::vector<Client> _clients;
+	static std::vector<Channel> _channels;
+	static std::string _hostname;
+	static std::string _servername;
+	static std::map<std::string, cmdFunction> _cmdMap;
 
 	static void on(std::string event, cmdFunction function);
 
@@ -51,15 +50,26 @@ public:
 	static std::string formatMessage(Client const &client, std::string const &code);
 	static void fillCmdMap(void);
 
-  void createChannel(std::string name);
-  void joinChannel(std::string channel, std::string key, Client& client);
-  std::vector<Channel>::iterator getChnlByName(std::string name);
-  int	getFdByNick(std::string nickname);
-  std::string getNickByFd(int fd);
-  void joinCmd(std::string msg, Client& client);
-  void quitCmd(std::string msg, Client& client);
-  void kickCmd(std::string msg, Client& client);
+	void createChannel(std::string name);
+	void joinChannel(std::string channel, std::string key, Client &client);
+	std::vector<Channel>::iterator getChnlByName(std::string name);
+	int getFdByNick(std::string nickname);
+	std::string getNickByFd(int fd);
 	static std::map<std::string, cmdFunction> getCmdMap(void);
+
+	//Cmd Functions
+	void joinCmd(Client &client);
+	void quitCmd(Client &client);
+	void kickCmd(Client &client);
+	void partCmd(Client &client);
+	void modeCmd(Client &client);
+	void topicCmd(Client &client);
+	void inviteCmd(Client &client);
+	void privmsgCmd(Client &client);
+	void listCmd(Client &client);
+	void whoCmd(Client &client);
+	void lusersCmd(Client &client);
+	void nickCmd(Client &client);
 };
 
 #endif
