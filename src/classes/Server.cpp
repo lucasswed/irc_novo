@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/20 16:39:01 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/12/19 13:38:20 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2024/01/02 11:52:29 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,10 +40,10 @@ bool Server::signUpClient(Client &client)
 
 void Server::runCmd(Client const &client)
 {
-	std::string cmd = client.cmd[0];
-	if (client.cmd.size() == 0 || client.cmd[0].empty())
+	std::string cmd = client.getCmd()[0];
+	if (client.getCmd().size() == 0 || client.getCmd()[0].empty())
 		return ;
-	
+	Manager::getCmdMap()[cmd];
 }
 
 void Server::messageHandler(int socket, int read, char *buffer)
@@ -60,7 +60,7 @@ void Server::messageHandler(int socket, int read, char *buffer)
 			return;
 		}
 		client.temp += msg;
-		client.cmd = ft_split(client.temp, "\r\n\t ");
+		client.setCmd(ft_split(client.temp, "\r\n\t "));
 		std::cout << GREEN << "Message received: " << client.temp << RESET << std::endl;
 		if (!Manager::checkClientData(client))
 			this->signUpClient(client);

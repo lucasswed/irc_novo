@@ -6,7 +6,7 @@
 /*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 16:52:20 by ralves-g          #+#    #+#             */
-/*   Updated: 2023/12/27 15:53:17 by pcampos-         ###   ########.fr       */
+/*   Updated: 2024/01/02 12:09:37 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,11 +94,6 @@ void Channel::setOperators(std::vector<Client> operators)
 void Channel::setInvited(std::vector<Client> invited)
 {
 	this->_invited = invited;
-}
-
-void Channel::setMode(std::map<std::string, bool> modes)
-{
-	this->_modes = modes;
 }
 
 void Channel::setTopic(std::string topic)
