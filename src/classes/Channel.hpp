@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 16:52:15 by ralves-g          #+#    #+#             */
-/*   Updated: 2023/12/27 15:54:30 by pcampos-         ###   ########.fr       */
+/*   Updated: 2024/01/02 12:15:10 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,14 +28,16 @@ class Channel {
 		std::string					_name;
 		std::string					_key;
 		int							_clientLimit;
-		std::vector<Client>			_members;
-		std::vector<Client>			_operators;
-		std::vector<Client>			_invited;
+
+		//change users to FDs!!!
+		std::vector<Client>	_members;
+		std::vector<Client>	_operators;
+		std::vector<Client>	_invited;
 		std::map<std::string, bool>	_modes;
 		std::string					_topic;
 
 	public:
-		Channel(std::string name);
+		Channel(std::string const name);
 		~Channel();
 
 		//getters
@@ -45,17 +47,20 @@ class Channel {
 		std::vector<Client> getMembers() const;
 		std::vector<Client> getOperators() const;
 		std::vector<Client> getInvited() const;
-		std::map<std::string, bool> getModes() const;
+		int getMode(std::string mode) const;
 		std::string getTopic() const;
+		bool isMember(Client client);
+		bool isOperator(Client Client);
+		bool isInvited(Client Client);
 
 		//setters
 		void setName(std::string name);
 		void setKey(std::string key);
 		void setClientLimit(int limit);
-		void setMembers(std::vector<Client> members);
-		void setOperators(std::vector<Client> operators);
-		void setInvited(std::vector<Client> invited);
-		void setModes(std::map<std::string, bool> modes);
+		void addMembers(std::vector<Client> members);
+		void addOperators(std::vector<Client> operators);
+		void Invite(std::vector<Client> invited);
+		void setModes(std::map<std::string, bool> mode, bool flags);
 		void setTopic(std::string topic);
 
 		void addClient(Client &client);
