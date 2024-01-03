@@ -6,7 +6,7 @@
 /*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:13:17 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/03 11:36:13 by pcampos-         ###   ########.fr       */
+/*   Updated: 2024/01/03 16:01:33 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ void Manager::fillMaps(void)
 	// on("PRIVMSG", &);
 	// on("LIST", &);
 	// on("NAMES", &);
-	// on("WHO", &);
 	// on("LUSERS", &);
 	// on("NICK", &);
 	//MODES
@@ -433,6 +432,42 @@ void Manager::listCmd(Client &client)
 		sendMessage(formatMessage(client, RPL_LIST) + " " +  std::to_string(channelIt->getMembers().size()) + ": " + channelIt->getTopic(), client.getFd());
 	}
 	sendMessage(formatMessage(client, RPL_LISTEND) + " :End of list", client.getFd());
+}
+
+void Manager::lusersCmd(Client &client)
+{
+	sendMessage(formatMessage(client, LUSERCLIENT) + " :There are " + std::to_string(_clients.size()) + " users on 1 server", client.getFd());
+	int ops;
+	for (std::vector<Channel>::iterator channelIt = _channels.begin(); channelIt != _channels.end(); channelIt++)
+		ops += channelIt->getOperators().size();
+	if (ops > 0)
+		sendMessage(formatMessage(client, LUSEROP) + std::to_string(ops) + " :operator(s) online", client.getFd());
+	if (_channels.size() > 0)
+		sendMessage(formatMessage(client, LUSERCHANNELS) + std::to_string(_channels.size()) + " :channels formed", client.getFd());
+}
+
+void Manager::nickCmd(Client &client)
+{
+	std::vector<std::string> cmd = client.getCmd();
+	if (cmd.size() < 2)
+	{
+		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " COMMAND ERROR: Not enought paramaters", client.getFd());
+		return ;
+	}
+	if (!isNickValid(cmd[1]))
+	{
+		sendMessage(formatMessage(client, ERRONEUSNICKNAME) + " :Erroneus nickname", client.getFd());
+		return ;
+	}
+	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++)
+	{
+		if (it->getNickname() == cmd[1])
+		{
+			sendMessage(formatMessage(client, NICKNAMEINUSE) + " :Nickname is already in use", client.getFd());
+			return ;
+		}
+	}
+	client.setNickname(cmd[1]);
 }
 
 void Manager::privmsgCmd(Client& client) {

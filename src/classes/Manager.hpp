@@ -6,7 +6,7 @@
 /*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/01/03 11:03:54 by pcampos-         ###   ########.fr       */
+/*   Updated: 2024/01/03 15:45:05 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,6 @@ public:
 	void inviteCmd(Client &client);
 	void privmsgCmd(Client &client);
 	void listCmd(Client &client);
-	void whoCmd(Client &client);
 	void lusersCmd(Client &client);
 	void nickCmd(Client &client);
 };
