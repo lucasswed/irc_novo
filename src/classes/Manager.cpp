@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Manager.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:13:17 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/03 16:01:33 by pcampos-         ###   ########.fr       */
+/*   Updated: 2024/01/03 18:55:04 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -320,36 +320,46 @@ void Manager::quitCmd(Client &client) {
 
 void Manager::kickCmd(Client &client) {
 	std::vector<std::string> tokens = client.getCmd();
-	if (tokens.size() != 3 && tokens.size() != 4)
+	if (tokens.size() < 4)
 	{
 		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " " + client.getCmd()[0] + " :Not enough parameters", client.getFd());
 		return ;
 	}
-	if (getChnlByName(tokens[0]) == _channels.end())
+	std::vector<std::string> channels = ft_split(tokens[0], ",");
+	std::vector<std::string> clients = ft_split(tokens[1], ",");
+	if (channels.size() != clients.size() && channels.size() != 1)
 	{
-		sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + tokens[0] + " :No such channel", client.getFd());
+		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " " + client.getCmd()[0] + " :Not enough parameters", client.getFd());
 		return ;
 	}
-	if (!getChnlByName(tokens[0])->isInvited(client.getFd()))
+	if (channels.size() == 1)
 	{
-		sendMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + tokens[0] + " :You're not channel operator", client.getFd());
+		if (getChnlByName(tokens[0]) == _channels.end())
+		{
+			sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + tokens[0] + " :No such channel", client.getFd());
+			return ;
+		}
+		if (!getChnlByName(tokens[0])->isOperator(client.getFd()))
+		{
+			sendMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + tokens[0] + " :You're not channel operator", client.getFd());
+			return ;
+		}
+		for (int i = 0; i < clients.size(); i++)
+		{
+			if (getChnlByName(tokens[0])->isMember(client.getFd()))
+				getChnlByName(channels[0])->kickClient(getFdByNick(clients[i]));
+			
+		}
+			//send message 
 		return ;
 	}
-	//multiple channels and users
-	// std::vector<std::string> channels = ft_split(tokens[0], ",");
-	// std::vector<std::string> clients = ft_split(tokens[1], ",");
-	// if (channels.size() != clients.size() && channels.size() != 1)
-	// {
-	// 	sendMessage(formatMessage(client, NEEDMOREPARAMS) + " " + client.getCmd()[0] + " :Not enough parameters", client.getFd());
-	// 	return ;
-	// }
-	// if (channels.size() == 1)
-	// {
-	// 	for (int i = 0; i < clients.size(); i++)
-	// 		getChnlByName(channels[0])->kickClient(getFdByNick(clients[i]));
-	// 		//send message 
-	// 	return ;
-	// }
+	else
+	{
+		for (int i = 0; i < clients.size(); i++)
+		{
+			getChnlByName(channels[0])->kickClient(getFdByNick(clients[i]));
+		}
+	}
 	getChnlByName(tokens[0])->kickClient(getFdByNick(tokens[1]));
 }
 
@@ -473,10 +483,36 @@ void Manager::nickCmd(Client &client)
 void Manager::privmsgCmd(Client& client) {
 	if (client.getCmd().size() < 2)
 	{
-		
+		sendMessage(formatMessage(client, ERR_NORECIPIENT) + " :No recipient given" +  std::to client.getCmd()[0], client.getFd());
 	}
 	if (client.getCmd().size() < 3)
 	{
-		
+		sendMessage(formatMessage(client, ERR_NOTEXTTOSEND) + " :No text to send", client.getFd());
+		return ;
+	}
+	std::vector<std::string> recipients = ft_split(client.getCmd()[1], ",");
+	for (int i = 0; i < recipients.size(); i++)
+	{
+		if (getFdByNick(recipients[i]) == -1)
+		{
+			sendMessage(formatMessage(client, NOSUCHNICK) + " " + recipients[i] + " :No such nick/channel", client.getFd());
+			continue;
+		}
+		else
+		{
+			int i2;
+			for (i2 = 0; i2 < _clients.size(); i2++)
+				if (_clients[i2].getFd() == getFdByNick(recipients[i]))
+					break;
+			if (i2 == _clients.size())
+			{
+				sendMessage(formatMessage(client, NOSUCHNICK) + " " + recipients[i] + " :No such nick/channel", client.getFd());
+				continue;
+			}
+			else
+			{
+				sendMessage(formatMessage(_clients[i2], client.getCmd()[2]), getFdByNick(recipients[i]));
+			}
+		}
 	}
 }

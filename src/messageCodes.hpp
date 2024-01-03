@@ -6,7 +6,7 @@
 /*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/16 10:27:02 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/02 17:13:43 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/03 18:55:41 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@
 #define NOSUCHSERVER "402"
 #define ERR_NOSUCHCHANNEL "403"
 #define CANNOTSENDTOCHAN "404"
+#define ERR_NORECIPIENT "411"
 #define ERR_NOTEXTTOSEND "412"
 #define UNKNOWNCOMMAND "421"
 #define NONICKNAMEGIVEN "431"
