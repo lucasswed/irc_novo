@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 16:52:20 by ralves-g          #+#    #+#             */
-/*   Updated: 2024/01/02 16:24:11 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/03 11:02:37 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,11 @@
 # define FAILURE 1
 
 Channel::Channel(std::string const name): _name(name) {
-	;
+	_modes.insert(std::pair<std::string, bool>("INVITE", false));
+	_modes.insert(std::pair<std::string, bool>("TOPIC", false));
+	_modes.insert(std::pair<std::string, bool>("KEY", false));
+	_modes.insert(std::pair<std::string, bool>("OPERATOR", false));
+	_modes.insert(std::pair<std::string, bool>("LIMIT", false));
 }
 
 Channel const& Channel::operator=(Channel const &ref){

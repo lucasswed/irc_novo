@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Manager.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:13:17 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/02 18:14:50 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/03 11:36:13 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,14 +21,20 @@ void Manager::on(std::string event, cmdFunction function)
 	_cmdMap.insert(std::pair<std::string, cmdFunction>(event, function));
 }
 
-void Manager::fillCmdMap(void)
+void Manager::on(std::string event, modeFunction function)
 {
+	_modeMap.insert(std::pair<std::string, modeFunction>(event, function));
+}
+
+void Manager::fillMaps(void)
+{
+	//COMMANDS
 	// on("JOIN", &);
 	// on("QUIT", &);
 	// on("KICK", &);
 	// on("PART", &);
 	// on("MODE", &);
-	on("TOPIC", &Manager::topicCmd);
+	// on("TOPIC", &Manager::topicCmd);
 	// on("INVITE", &);
 	// on("PRIVMSG", &);
 	// on("LIST", &);
@@ -36,6 +42,13 @@ void Manager::fillCmdMap(void)
 	// on("WHO", &);
 	// on("LUSERS", &);
 	// on("NICK", &);
+	//MODES
+	// on("INVITE", &);
+	// on("TOPIC", &);
+	// on("KEY", &);
+	// on("OPERATOR", &);
+	// on("LIMIT", &);
+
 }
 
 bool Manager::addClient(int fd)
@@ -221,7 +234,7 @@ void Manager::topicCmd(Client &client)
 	}
 	else
 	{
-		if (channelIt->getMode("t") && !channelIt->isOperator(client.getFd()))
+		if (channelIt->getMode("TOPIC") && !channelIt->isOperator(client.getFd()))
 		{
 			sendMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + cmd[1] + " :You're not channel operator", client.getFd());
 			return;
@@ -390,6 +403,36 @@ void Manager::partCmd(Client &client) {
 			//msg
 		}
 	}
+}
+
+void Manager::listCmd(Client &client)
+{
+	std::vector<std::string> cmd = client.getCmd();
+	if (cmd.size() == 1)
+	{
+		sendMessage(formatMessage(client, RPL_LISTSTART) + " :List of Channels", client.getFd());
+		for (std::vector<Channel>::iterator channelIt = _channels.begin(); channelIt != _channels.end(); channelIt++)
+			sendMessage(formatMessage(client, RPL_LIST) + " " +  std::to_string(channelIt->getMembers().size()) + ": " + channelIt->getTopic(), client.getFd());
+		sendMessage(formatMessage(client, RPL_LISTEND) + " :End of list", client.getFd());
+		return ;
+	}
+	std::vector<std::string> chans = ft_split(cmd[1], ",");
+	for(std::vector<std::string>::iterator it = chans.begin(); it != chans.end(); it++)
+	{
+		std::vector<Channel>::iterator channelIt = getChnlByName(*it);
+		if (channelIt == _channels.end())
+		{
+			sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + *it + " :No such channel", client.getFd());
+			return;
+		}
+	}
+	sendMessage(formatMessage(client, RPL_LISTSTART) + " :List of Channels", client.getFd());
+	for(std::vector<std::string>::iterator it = chans.begin(); it != chans.end(); it++)
+	{
+		std::vector<Channel>::iterator channelIt = getChnlByName(*it);
+		sendMessage(formatMessage(client, RPL_LIST) + " " +  std::to_string(channelIt->getMembers().size()) + ": " + channelIt->getTopic(), client.getFd());
+	}
+	sendMessage(formatMessage(client, RPL_LISTEND) + " :End of list", client.getFd());
 }
 
 void Manager::privmsgCmd(Client& client) {

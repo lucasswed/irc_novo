@@ -6,7 +6,7 @@
 /*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/20 16:39:01 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/02 12:43:34 by pcampos-         ###   ########.fr       */
+/*   Updated: 2024/01/03 11:00:25 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ bool Server::signUpClient(Client &client)
 	return (true);
 }
 
-void Server::runCmd(Client const &client)
+void Server::runCmd(Client &client)
 {
 	std::string cmd = client.getCmd()[0];
 	if (client.getCmd().size() == 0 || client.getCmd()[0].empty())

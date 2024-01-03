@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Manager.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/01/02 17:10:49 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/03 11:03:54 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 #include <sys/socket.h>
 
 typedef void (*cmdFunction)(Client &client);
+typedef void (*modeFunction)(Channel &channel, Client &client);
 
 class Manager
 {
@@ -36,8 +37,10 @@ private:
 	static std::string _hostname;
 	static std::string _servername;
 	static std::map<std::string, cmdFunction> _cmdMap;
+	static std::map<std::string, modeFunction> _modeMap;
 
 	static void on(std::string event, cmdFunction function);
+	static void on(std::string event, modeFunction function);
 
 public:
 	static bool addClient(int fd);
@@ -48,7 +51,7 @@ public:
 	static bool checkNick(Client const &client);
 	static void sendMessage(std::string message, int clientFd);
 	static std::string formatMessage(Client const &client, std::string const &code);
-	static void fillCmdMap(void);
+	static void fillMaps(void);
 
 	void createChannel(std::string name);
 	void joinChannel(std::string channel, std::string key, Client client);
