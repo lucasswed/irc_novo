@@ -3,16 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   Manager.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:13:17 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/03 18:55:04 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/04 16:11:57 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "Channel.hpp"
 #include "Manager.hpp"
 
 std::vector<Client> Manager::_clients;
+std::vector<Channel> Manager::_channels;
+std::map<std::string, cmdFunction> Manager::_cmdMap;
 std::string Manager::_hostname = "localhost";
 std::string Manager::_servername = "irc.server.com";
 
@@ -21,33 +24,43 @@ void Manager::on(std::string event, cmdFunction function)
 	_cmdMap.insert(std::pair<std::string, cmdFunction>(event, function));
 }
 
-void Manager::on(std::string event, modeFunction function)
+// void Manager::on(std::string event, modeFunction function)
+// {
+// 	_modeMap.insert(std::pair<std::string, modeFunction>(event, function));
+// }
+
+std::string Manager::formatMessage(const Client &client)
 {
-	_modeMap.insert(std::pair<std::string, modeFunction>(event, function));
+	return (":" + client.getNickname() + "!" + client.getUsername() + "@" + Manager::_hostname);
 }
 
 void Manager::fillMaps(void)
 {
-	//COMMANDS
-	// on("JOIN", &);
-	// on("QUIT", &);
-	// on("KICK", &);
-	// on("PART", &);
-	// on("MODE", &);
-	// on("TOPIC", &Manager::topicCmd);
-	// on("INVITE", &);
-	// on("PRIVMSG", &);
-	// on("LIST", &);
-	// on("NAMES", &);
-	// on("LUSERS", &);
-	// on("NICK", &);
-	//MODES
-	// on("INVITE", &);
-	// on("TOPIC", &);
-	// on("KEY", &);
-	// on("OPERATOR", &);
-	// on("LIMIT", &);
+	// COMMANDS
+	on("WHO", &Manager::whoCmd);
+	on("JOIN", &Manager::joinCmd);
+	on("QUIT", &Manager::quitCmd);
+	on("KICK", &Manager::kickCmd);
+	on("PART", &Manager::partCmd);
+	on("MODE", &Manager::modeCmd);
+	on("TOPIC", &Manager::topicCmd);
+	on("INVITE", &Manager::inviteCmd);
+	on("PRIVMSG", &Manager::privmsgCmd);
+	on("LIST", &Manager::listCmd);
+	on("LUSERS", &Manager::lusersCmd);
+	on("NICK", &Manager::nickCmd);
+	// MODES
+	//  on("INVITE", &);
+	//  on("TOPIC", &);
+	//  on("KEY", &);
+	//  on("OPERATOR", &);
+	//  on("LIMIT", &);
+}
 
+void Manager::whoCmd(Client &client)
+{
+	(void)client;
+	std::clog << LIGHTPURPLE << "WHO CMD" << RESET << std::endl;
 }
 
 bool Manager::addClient(int fd)
@@ -160,7 +173,8 @@ std::map<std::string, cmdFunction> Manager::getCmdMap(void)
 	return (_cmdMap);
 }
 
-std::vector<Channel>::iterator Manager::getChnlByName(std::string name) {
+std::vector<Channel>::iterator Manager::getChnlByName(std::string name)
+{
 	std::vector<Channel>::iterator itr;
 	for (itr = _channels.begin(); itr != _channels.end(); itr++)
 	{
@@ -170,7 +184,8 @@ std::vector<Channel>::iterator Manager::getChnlByName(std::string name) {
 	return (itr);
 }
 
-int	Manager::getFdByNick(std::string nickname) {
+int Manager::getFdByNick(std::string nickname)
+{
 	std::vector<Client>::iterator itr;
 	for (itr = _clients.begin(); itr != _clients.end(); itr++)
 	{
@@ -180,7 +195,8 @@ int	Manager::getFdByNick(std::string nickname) {
 	return (itr != _clients.end() ? itr->getFd() : -1);
 }
 
-std::string Manager::getNickByFd(int fd) {
+std::string Manager::getNickByFd(int fd)
+{
 	std::vector<Client>::iterator itr;
 	for (itr = _clients.begin(); itr != _clients.end(); itr++)
 	{
@@ -190,17 +206,8 @@ std::string Manager::getNickByFd(int fd) {
 	return (itr != _clients.end() ? itr->getNickname() : "");
 }
 
-std::vector<Channel>::iterator Manager::getChnlByName(std::string name) {
-	std::vector<Channel>::iterator itr;
-	for (itr = _channels.begin(); itr != _channels.end(); itr++)
-	{
-		if (name == itr->getName())
-			break;
-	}
-	return (itr);
-}
-
-void Manager::createChannel(std::string name) {
+void Manager::createChannel(std::string name)
+{
 	_channels.push_back(Channel(name));
 }
 
@@ -210,7 +217,7 @@ void Manager::topicCmd(Client &client)
 	if (cmd.size() < 2)
 	{
 		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " COMMAND ERROR: Not enought paramaters", client.getFd());
-		return ;
+		return;
 	}
 	std::vector<Channel>::iterator channelIt = getChnlByName(cmd[1]);
 	if (channelIt == _channels.end())
@@ -246,116 +253,136 @@ void Manager::topicCmd(Client &client)
 	}
 }
 
-void Manager::joinChannel(std::string channel, std::string key, Client client) {
- 	std::vector<Channel>::iterator itr = getChnlByName(channel);
+void Manager::joinChannel(std::string channel, std::string key, Client client)
+{
+	std::vector<Channel>::iterator itr = getChnlByName(channel);
 	if (itr == _channels.end())
 	{
 		createChannel(channel);
-		return ;
+		getChnlByName(channel)->addOperator(client.getFd());
+		// sendMessage(formatMessage(client, "Successfully joined " + channel), client.getFd());
+		sendMessage(formatMessage(client) + " JOIN " + channel, client.getFd());
+		if (getChnlByName(channel)->getMode("TOPIC") == 1)
+			sendMessage(formatMessage(client, RPL_TOPIC) + " " + channel + " :No topic is set", client.getFd());
+		else
+			sendMessage(formatMessage(client, RPL_NOTOPIC) + " " + channel + " :" + getChnlByName(channel)->getTopic(), client.getFd());
+
+		return;
 	}
 	if (itr->getMode("INVITE") == 1)
 	{
 		if (!itr->isInvited(client.getFd()))
 		{
 			sendMessage(formatMessage(client, INVITEONLYCHAN) + " " + channel + " :Cannot join channel (+i)", client.getFd());
-			return ;
+			return;
 		}
 	}
 	if (itr->getMode("KEY") && key != itr->getKey())
 	{
 		sendMessage(formatMessage(client, BADCHANNELKEY) + " " + channel + " :Cannot join channel (+k)", client.getFd());
-		return ;
+		return;
 	}
-	if (itr->getMode("LIMIT") && itr->getMembers().size() >= itr->getClientLimit())
+
+	if (itr->getMode("LIMIT") == 1 && itr->getMembers().size() >= itr->getClientLimit())
 	{
-		itr->addMember(client.getFd());
-		sendMessage(formatMessage(client, "Successfully joined " + channel), client.getFd());
-		if (getChnlByName(channel)->getMode("t") == 1)
-			sendMessage(formatMessage(client, RPL_TOPIC) + " " + channel + " :No topic is set", client.getFd());
-		else
-			sendMessage(formatMessage(client, RPL_NOTOPIC) + " " + channel + " :" + getChnlByName(channel)->getTopic(), client.getFd());
+		sendMessage(formatMessage(client, CHANNELISFULL) + " " + channel + " :Cannot join channel (+l)", client.getFd());
+		return;
 	}
 	else
 	{
-		sendMessage(formatMessage(client, CHANNELISFULL) + " " + channel + " :Cannot join channel (+l)", client.getFd());
-		return ;
+		itr->addMember(client.getFd());
+		// sendMessage(formatMessage(client, "Successfully joined " + channel), client.getFd());
+		sendMessage(formatMessage(client) + " JOIN " + channel, client.getFd());
+		if (getChnlByName(channel)->getMode("TOPIC") == 1)
+			sendMessage(formatMessage(client, RPL_TOPIC) + " " + channel + " :No topic is set", client.getFd());
+		else
+			sendMessage(formatMessage(client, RPL_NOTOPIC) + " " + channel + " :" + getChnlByName(channel)->getTopic(), client.getFd());
+		return;
 	}
 }
 
-void Manager::joinCmd(Client &client) {
-	std::vector<std::string> channels = ft_split(client.getCmd()[1], ",");
-
-	if (channels.size() == 1 && channels[0] == "0")
+void Manager::joinCmd(Client &client)
+{
+	std::vector<std::string> channelsToEnter = ft_split(client.getCmd()[1], ",");
+	if (channelsToEnter.size() == 1 && channelsToEnter[0] == "0")
 	{
-		for (int i, i2 = 0; i < _channels.size(); i++)
+		for (size_t i = 0; i < _channels.size(); i++)
 			_channels[i].kickClient(client.getFd());
-		return ;
+		return;
 	}
-	std::vector<std::string> keys = ft_split(client.getCmd()[2], ",");
-	std::vector<Channel>::iterator c_itr;
 
-	if (channels.size() < keys.size())
+	std::vector<std::string> keys;
+	if (client.getCmd().size() >= 3)
+		keys = ft_split(client.getCmd()[2], ",");
+	std::vector<Channel>::iterator c_itr;
+	if (channelsToEnter.size() < keys.size())
 	{
-		sendMessage(formatMessage(client, "Error: too many keys for the number of channels"), client.getFd()); //to check
-		return ;
+		sendMessage(formatMessage(client, "Error: too many keys for the number of channels"), client.getFd()); // to check
+		return;
 	}
-	for (int i, i2 = 0; i < channels.size(); i++)
+
+	for (size_t i = 0, i2 = 0; i < channelsToEnter.size(); i++)
 	{
-		if (getChnlByName(channels[i])->getMode("KEY") && i2 == keys.size())
+		std::clog << LIGHTPURPLE << "channel: " << channelsToEnter[i] << RESET << std::endl;
+		if (getChnlByName(channelsToEnter[i]) != _channels.end() && getChnlByName(channelsToEnter[i])->getMode("KEY") == 1 && i2 == keys.size())
 		{
-			sendMessage(formatMessage(client, "Error: not enough keys for the number of key protected channels"), client.getFd()); //to check
-			return ;
+			sendMessage(formatMessage(client, "Error: not enough keys for the number of key protected channels"), client.getFd()); // to check
+			return;
 		}
-		joinChannel(channels[i], keys[i], client);
-		if (getChnlByName(channels[i])->getMode("KEY"))
+		if (keys.size() == 0)
+			joinChannel(channelsToEnter[i], "", client);
+		else
+			joinChannel(channelsToEnter[i], keys[i], client);
+		if (getChnlByName(channelsToEnter[i])->getMode("KEY"))
 			i2++;
 	}
 }
 
-void Manager::quitCmd(Client &client) {
-	for (int i, i2 = 0; i < _channels.size(); i++)
+void Manager::quitCmd(Client &client)
+{
+	for (size_t i = 0; i < _channels.size(); i++)
 		_channels[i].kickClient(client.getFd());
 	sendMessage(formatMessage(client, "Quit: Gone to have lunch"), client.getFd());
 }
 
-void Manager::kickCmd(Client &client) {
+void Manager::kickCmd(Client &client)
+{
 	std::vector<std::string> tokens = client.getCmd();
 	if (tokens.size() < 4)
 	{
 		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " " + client.getCmd()[0] + " :Not enough parameters", client.getFd());
-		return ;
+		return;
 	}
 	std::vector<std::string> channels = ft_split(tokens[0], ",");
 	std::vector<std::string> clients = ft_split(tokens[1], ",");
 	if (channels.size() != clients.size() && channels.size() != 1)
 	{
 		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " " + client.getCmd()[0] + " :Not enough parameters", client.getFd());
-		return ;
+		return;
 	}
 	if (channels.size() == 1)
 	{
 		if (getChnlByName(tokens[0]) == _channels.end())
 		{
 			sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + tokens[0] + " :No such channel", client.getFd());
-			return ;
+			return;
 		}
 		if (!getChnlByName(tokens[0])->isOperator(client.getFd()))
 		{
 			sendMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + tokens[0] + " :You're not channel operator", client.getFd());
-			return ;
+			return;
 		}
-		for (int i = 0; i < clients.size(); i++)
+		for (size_t i = 0; i < clients.size(); i++)
 		{
 			if (getChnlByName(tokens[0])->isMember(client.getFd()))
 				getChnlByName(channels[0])->kickClient(getFdByNick(clients[i]));
-			
 		}
-			//send message 
-		return ;
+		// send message
+		return;
 	}
 	else
 	{
-		for (int i = 0; i < clients.size(); i++)
+		for (size_t i = 0; i < clients.size(); i++)
 		{
 			getChnlByName(channels[0])->kickClient(getFdByNick(clients[i]));
 		}
@@ -363,44 +390,46 @@ void Manager::kickCmd(Client &client) {
 	getChnlByName(tokens[0])->kickClient(getFdByNick(tokens[1]));
 }
 
-void Manager::inviteCmd(Client &client) {
+void Manager::inviteCmd(Client &client)
+{
 	if (client.getCmd().size() != 3)
 	{
 		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " " + client.getCmd()[0] + " :Not enough parameters", client.getFd());
-		return ;
+		return;
 	}
 	if (getFdByNick(client.getCmd()[1]) == -1)
 	{
 		sendMessage(formatMessage(client, NOSUCHNICK) + " " + client.getCmd()[1] + " :No such nick/channel", client.getFd());
-		return ;
+		return;
 	}
 	if (getChnlByName(client.getCmd()[2]) == _channels.end())
 	{
 		sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + client.getCmd()[2] + " :No such channel", client.getFd());
-		return ;
+		return;
 	}
 	if (getChnlByName(client.getCmd()[2])->isMember(getFdByNick(client.getCmd()[1])))
 	{
 		sendMessage(formatMessage(client, ERR_USERONCHANNEL) + " " + client.getCmd()[1] + " " + client.getCmd()[2] + " :is already on channel", client.getFd());
-		return ;
+		return;
 	}
 	if (getChnlByName(client.getCmd()[2])->getMode("INVITED") && !(getChnlByName(client.getCmd()[2])->isOperator(client.getFd())))
 	{
 		sendMessage(formatMessage(client, INVITEONLYCHAN) + " " + client.getCmd()[2] + " :Cannot join channel (+i)", client.getFd());
-		return ;
+		return;
 	}
 	getChnlByName(client.getCmd()[2])->Invite(getFdByNick(client.getCmd()[1]));
 	sendMessage(formatMessage(client, INVITING) + " " + client.getCmd()[2] + " " + client.getCmd()[1], client.getFd());
 }
 
-void Manager::partCmd(Client &client) {
+void Manager::partCmd(Client &client)
+{
 	if (client.getCmd().size() != 2)
 	{
 		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " " + client.getCmd()[0] + " :Not enough parameters", client.getFd());
-		return ;
+		return;
 	}
 	std::vector<std::string> channels = ft_split(client.getCmd()[1], " ");
-	for (int i = 0; i < channels.size(); i++)
+	for (size_t i = 0; i < channels.size(); i++)
 	{
 		if (getChnlByName(channels[i]) == _channels.end())
 			sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + channels[i] + " :No such channel", client.getFd());
@@ -409,7 +438,7 @@ void Manager::partCmd(Client &client) {
 		else
 		{
 			getChnlByName(channels[i])->kickClient(client.getFd());
-			//msg
+			// msg
 		}
 	}
 }
@@ -421,12 +450,12 @@ void Manager::listCmd(Client &client)
 	{
 		sendMessage(formatMessage(client, RPL_LISTSTART) + " :List of Channels", client.getFd());
 		for (std::vector<Channel>::iterator channelIt = _channels.begin(); channelIt != _channels.end(); channelIt++)
-			sendMessage(formatMessage(client, RPL_LIST) + " " +  std::to_string(channelIt->getMembers().size()) + ": " + channelIt->getTopic(), client.getFd());
+			sendMessage(formatMessage(client, RPL_LIST) + " " + channelIt->getName() + " " + to_string(channelIt->getMembers().size()) + " : " + channelIt->getTopic(), client.getFd());
 		sendMessage(formatMessage(client, RPL_LISTEND) + " :End of list", client.getFd());
-		return ;
+		return;
 	}
 	std::vector<std::string> chans = ft_split(cmd[1], ",");
-	for(std::vector<std::string>::iterator it = chans.begin(); it != chans.end(); it++)
+	for (std::vector<std::string>::iterator it = chans.begin(); it != chans.end(); it++)
 	{
 		std::vector<Channel>::iterator channelIt = getChnlByName(*it);
 		if (channelIt == _channels.end())
@@ -436,24 +465,24 @@ void Manager::listCmd(Client &client)
 		}
 	}
 	sendMessage(formatMessage(client, RPL_LISTSTART) + " :List of Channels", client.getFd());
-	for(std::vector<std::string>::iterator it = chans.begin(); it != chans.end(); it++)
+	for (std::vector<std::string>::iterator it = chans.begin(); it != chans.end(); it++)
 	{
 		std::vector<Channel>::iterator channelIt = getChnlByName(*it);
-		sendMessage(formatMessage(client, RPL_LIST) + " " +  std::to_string(channelIt->getMembers().size()) + ": " + channelIt->getTopic(), client.getFd());
+		sendMessage(formatMessage(client, RPL_LIST) + " " + to_string(channelIt->getMembers().size()) + ": " + channelIt->getTopic(), client.getFd());
 	}
 	sendMessage(formatMessage(client, RPL_LISTEND) + " :End of list", client.getFd());
 }
 
 void Manager::lusersCmd(Client &client)
 {
-	sendMessage(formatMessage(client, LUSERCLIENT) + " :There are " + std::to_string(_clients.size()) + " users on 1 server", client.getFd());
+	sendMessage(formatMessage(client, LUSERCLIENT) + " :There are " + to_string(_clients.size()) + " users on 1 server", client.getFd());
 	int ops;
 	for (std::vector<Channel>::iterator channelIt = _channels.begin(); channelIt != _channels.end(); channelIt++)
 		ops += channelIt->getOperators().size();
 	if (ops > 0)
-		sendMessage(formatMessage(client, LUSEROP) + std::to_string(ops) + " :operator(s) online", client.getFd());
+		sendMessage(formatMessage(client, LUSEROP) + to_string(ops) + " :operator(s) online", client.getFd());
 	if (_channels.size() > 0)
-		sendMessage(formatMessage(client, LUSERCHANNELS) + std::to_string(_channels.size()) + " :channels formed", client.getFd());
+		sendMessage(formatMessage(client, LUSERCHANNELS) + to_string(_channels.size()) + " :channels formed", client.getFd());
 }
 
 void Manager::nickCmd(Client &client)
@@ -462,36 +491,37 @@ void Manager::nickCmd(Client &client)
 	if (cmd.size() < 2)
 	{
 		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " COMMAND ERROR: Not enought paramaters", client.getFd());
-		return ;
+		return;
 	}
 	if (!isNickValid(cmd[1]))
 	{
 		sendMessage(formatMessage(client, ERRONEUSNICKNAME) + " :Erroneus nickname", client.getFd());
-		return ;
+		return;
 	}
 	for (std::vector<Client>::iterator it = _clients.begin(); it != _clients.end(); it++)
 	{
 		if (it->getNickname() == cmd[1])
 		{
 			sendMessage(formatMessage(client, NICKNAMEINUSE) + " :Nickname is already in use", client.getFd());
-			return ;
+			return;
 		}
 	}
 	client.setNickname(cmd[1]);
 }
 
-void Manager::privmsgCmd(Client& client) {
+void Manager::privmsgCmd(Client &client)
+{
 	if (client.getCmd().size() < 2)
 	{
-		sendMessage(formatMessage(client, ERR_NORECIPIENT) + " :No recipient given" +  std::to client.getCmd()[0], client.getFd());
+		sendMessage(formatMessage(client, ERR_NORECIPIENT) + " :No recipient given" + toUP(client.getCmd()[0]), client.getFd());
 	}
 	if (client.getCmd().size() < 3)
 	{
 		sendMessage(formatMessage(client, ERR_NOTEXTTOSEND) + " :No text to send", client.getFd());
-		return ;
+		return;
 	}
 	std::vector<std::string> recipients = ft_split(client.getCmd()[1], ",");
-	for (int i = 0; i < recipients.size(); i++)
+	for (size_t i = 0; i < recipients.size(); i++)
 	{
 		if (getFdByNick(recipients[i]) == -1)
 		{
@@ -500,7 +530,7 @@ void Manager::privmsgCmd(Client& client) {
 		}
 		else
 		{
-			int i2;
+			size_t i2;
 			for (i2 = 0; i2 < _clients.size(); i2++)
 				if (_clients[i2].getFd() == getFdByNick(recipients[i]))
 					break;
@@ -515,4 +545,10 @@ void Manager::privmsgCmd(Client& client) {
 			}
 		}
 	}
+}
+
+void Manager::modeCmd(Client &client)
+{
+	(void)client;
+	std::clog << LIGHTPURPLE << "ENTREI FDP" << RESET << std::endl;
 }

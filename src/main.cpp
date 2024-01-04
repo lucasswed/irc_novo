@@ -6,7 +6,7 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 19:22:33 by lucas-ma          #+#    #+#             */
-/*   Updated: 2023/12/12 19:08:41 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2024/01/04 14:58:43 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,7 @@ int main(int ac, char **av)
 		return (1);
 	Server server(av[1], av[2]);
 
+	Manager::fillMaps();
 	server.start();
 	return (0);
 }

@@ -3,13 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 23:44:14 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/02 16:34:58 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/04 13:02:13 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <sstream>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -45,4 +46,11 @@ std::string toUP(std::string str)
 	std::string ret = str;
 	std::transform(ret.begin(), ret.end(), ret.begin(), toupper);
 	return (ret);
+}
+
+std::string to_string(size_t const &size)
+{
+	std::stringstream ss;
+	ss << size;
+	return (ss.str());
 }

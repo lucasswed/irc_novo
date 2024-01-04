@@ -3,33 +3,31 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 16:52:20 by ralves-g          #+#    #+#             */
-/*   Updated: 2024/01/03 11:02:37 by pcampos-         ###   ########.fr       */
+/*   Updated: 2024/01/04 16:02:15 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Channel.hpp"
 #include "Client.hpp"
 
-# define SUCCESS 0
-# define FAILURE 1
+#define SUCCESS 0
+#define FAILURE 1
 
-Channel::Channel(std::string const name): _name(name) {
-	_modes.insert(std::pair<std::string, bool>("INVITE", false));
-	_modes.insert(std::pair<std::string, bool>("TOPIC", false));
-	_modes.insert(std::pair<std::string, bool>("KEY", false));
-	_modes.insert(std::pair<std::string, bool>("OPERATOR", false));
-	_modes.insert(std::pair<std::string, bool>("LIMIT", false));
+Channel::Channel(std::string const name) : _name(name)
+{
+	_modes.insert(std::pair<std::string, int>("INVITE", 0));
+	_modes.insert(std::pair<std::string, int>("TOPIC", 0));
+	_modes.insert(std::pair<std::string, int>("KEY", 0));
+	_modes.insert(std::pair<std::string, int>("OPERATOR", 0));
+	_modes.insert(std::pair<std::string, int>("LIMIT", 0));
 }
 
-Channel const& Channel::operator=(Channel const &ref){
-	;
-}
-
-Channel::~Channel() {
-	;
+Channel::~Channel()
+{
+	return;
 }
 
 std::string Channel::getName() const
@@ -42,16 +40,18 @@ std::string Channel::getKey() const
 	return (this->_key);
 }
 
-int Channel::getClientLimit() const
+size_t Channel::getClientLimit() const
 {
 	return (this->_clientLimit);
 }
 
-std::vector<int> Channel::getMembers() const {
+std::vector<int> Channel::getMembers() const
+{
 	return (this->_members);
 }
 
-std::vector<int> Channel::getOperators() const {
+std::vector<int> Channel::getOperators() const
+{
 	return (this->_operators);
 }
 
@@ -60,7 +60,7 @@ std::vector<int> Channel::getInvited() const
 	return (this->_invited);
 }
 
-std::map<std::string, bool> Channel::getModes() const
+std::map<std::string, int> Channel::getModes() const
 {
 	return (this->_modes);
 }
@@ -105,64 +105,71 @@ void Channel::setTopic(std::string topic)
 	this->_topic = topic;
 }
 
-int Channel::getMode(std::string mode) const {
-	return (_modes.find("mode") != _modes.end() ? _modes.find("mode")->second : -1);
+int Channel::getMode(std::string mode) const
+{
+	std::clog << "getMode: " << mode << std::endl;
+	for (std::map<std::string, int>::const_iterator it = _modes.begin(); it != _modes.end(); it++)
+		std::clog << it->first << " " << it->second << std::endl;
+	// for (std::map<std::string, bool>::const_iterator it = _modes.begin(); it != _modes.end(); it++)
+	// 	if (it->first == mode)
+	// 		return (it->second);
+	return (-1);
 }
 
-void Channel::setClientLimit(int limit ) {
-	_clientLimit = limit;
-}
-
-bool Channel::isMember(int client) {
-	for (int i = 0; i < _members.size(); i++)
+bool Channel::isMember(int client)
+{
+	for (size_t i = 0; i < _members.size(); i++)
 		if (client == _members[i])
 			return true;
 	return false;
 }
 
-bool Channel::isOperator(int client) {
-	for (int i = 0; i < _operators.size(); i++)
+bool Channel::isOperator(int client)
+{
+	for (size_t i = 0; i < _operators.size(); i++)
 		if (client == _operators[i])
 			return true;
 	return false;
 }
 
-bool Channel::isInvited(int client) {
-	for (int i = 0; i < _invited.size(); i++)
+bool Channel::isInvited(int client)
+{
+	for (size_t i = 0; i < _invited.size(); i++)
 		if (client == _invited[i])
 			return true;
 	return false;
 }
 
-void Channel::addMember(int client) {
+void Channel::addMember(int client)
+{
 	if (!isMember(client))
 		_members.push_back(client);
 }
 
-void Channel::addOperator(int client) {
+void Channel::addOperator(int client)
+{
 	if (!isOperator(client))
 		_operators.push_back(client);
 }
-void Channel::Invite(int client) {
+void Channel::Invite(int client)
+{
 	if (!isInvited(client))
 		_invited.push_back(client);
 }
 
-void Channel::setTopic(std::string topic) {
-	_topic = topic;
-}
-
-void Channel::setMode(std::string mode, bool flag) {
-	if(_modes.find(mode) != _modes.end())
+void Channel::setMode(std::string mode, bool flag)
+{
+	if (_modes.find(mode) != _modes.end())
 		_modes.find(mode)->second = flag;
 }
 
-void Channel::kickClient(int client) {
+void Channel::kickClient(int client)
+{
 	if (isOperator(client))
 		for (std::vector<int>::iterator itr = _operators.begin(); itr != _operators.end(); itr++)
 			if (*itr == client)
 				_operators.erase(itr);
-	if(isInvited(client))
+	if (isInvited(client))
 		for (std::vector<int>::iterator itr = _invited.begin(); itr != _invited.end(); itr++)
 			if (*itr == client)
 				_invited.erase(itr);

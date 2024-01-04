@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+         #
+#    By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/15 19:08:33 by lucas-ma          #+#    #+#              #
-#    Updated: 2023/12/29 15:10:42 by ralves-g         ###   ########.fr        #
+#    Updated: 2024/01/04 13:06:50 by lucas-ma         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -41,7 +41,7 @@ _CLASSES = $(_SRC)classes/
 CC		=	c++
 CFLAGS	=	-Wall -Werror -Wextra -std=c++98 -g -fsanitize=address
 #valgrind --leak-check=full --show-leak-kinds=all ./
-SRCS	=	$(_SRC)main.cpp $(_SRC)utils.cpp $(_CLASSES)Server.cpp $(_CLASSES)Client.cpp $(_CLASSES)Manager.cpp
+SRCS	=	$(_SRC)main.cpp $(_SRC)utils.cpp $(_CLASSES)Server.cpp $(_CLASSES)Client.cpp $(_CLASSES)Manager.cpp $(_CLASSES)Channel.cpp
 OBJS	=	$(patsubst $(_SRC)%.cpp,$(_OBJ)%.o,$(SRCS))
 DEPS	=
 LIBS	=
