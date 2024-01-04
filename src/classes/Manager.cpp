@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Manager.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:13:17 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/04 16:11:57 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2024/01/04 17:00:21 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,12 +229,12 @@ void Manager::topicCmd(Client &client)
 	{
 		if (channelIt->getTopic().empty())
 		{
-			sendMessage(formatMessage(client, "331") + " " + cmd[1] + " :No topic is set", client.getFd());
+			sendMessage(formatMessage(client, RPL_NOTOPIC) + " " + cmd[1] + " :No topic is set", client.getFd());
 			return;
 		}
 		else
 		{
-			sendMessage(formatMessage(client, RPL_TOPIC) + " " + cmd[1] + " :" + channelIt->getTopic(), client.getFd());
+			sendMessage(formatMessage(client, RPL_TOPIC) + " " + cmd[1] + " " + channelIt->getTopic(), client.getFd());
 			return;
 		}
 	}
@@ -248,7 +248,7 @@ void Manager::topicCmd(Client &client)
 		else
 		{
 			channelIt->setTopic(cmd[2]);
-			channelIt->messageAll(formatMessage(client, RPL_TOPIC) + " " + cmd[1] + " :" + channelIt->getTopic());
+			channelIt->messageAll(formatMessage(client, RPL_TOPIC) + " " + cmd[1] + " " + channelIt->getTopic());
 		}
 	}
 }
@@ -265,7 +265,7 @@ void Manager::joinChannel(std::string channel, std::string key, Client client)
 		if (getChnlByName(channel)->getMode("TOPIC") == 1)
 			sendMessage(formatMessage(client, RPL_TOPIC) + " " + channel + " :No topic is set", client.getFd());
 		else
-			sendMessage(formatMessage(client, RPL_NOTOPIC) + " " + channel + " :" + getChnlByName(channel)->getTopic(), client.getFd());
+			sendMessage(formatMessage(client, RPL_NOTOPIC) + " " + channel + " " + getChnlByName(channel)->getTopic(), client.getFd());
 
 		return;
 	}
@@ -296,7 +296,7 @@ void Manager::joinChannel(std::string channel, std::string key, Client client)
 		if (getChnlByName(channel)->getMode("TOPIC") == 1)
 			sendMessage(formatMessage(client, RPL_TOPIC) + " " + channel + " :No topic is set", client.getFd());
 		else
-			sendMessage(formatMessage(client, RPL_NOTOPIC) + " " + channel + " :" + getChnlByName(channel)->getTopic(), client.getFd());
+			sendMessage(formatMessage(client, RPL_NOTOPIC) + " " + channel + " " + getChnlByName(channel)->getTopic(), client.getFd());
 		return;
 	}
 }
@@ -323,7 +323,6 @@ void Manager::joinCmd(Client &client)
 
 	for (size_t i = 0, i2 = 0; i < channelsToEnter.size(); i++)
 	{
-		std::clog << LIGHTPURPLE << "channel: " << channelsToEnter[i] << RESET << std::endl;
 		if (getChnlByName(channelsToEnter[i]) != _channels.end() && getChnlByName(channelsToEnter[i])->getMode("KEY") == 1 && i2 == keys.size())
 		{
 			sendMessage(formatMessage(client, "Error: not enough keys for the number of key protected channels"), client.getFd()); // to check
@@ -450,7 +449,7 @@ void Manager::listCmd(Client &client)
 	{
 		sendMessage(formatMessage(client, RPL_LISTSTART) + " :List of Channels", client.getFd());
 		for (std::vector<Channel>::iterator channelIt = _channels.begin(); channelIt != _channels.end(); channelIt++)
-			sendMessage(formatMessage(client, RPL_LIST) + " " + channelIt->getName() + " " + to_string(channelIt->getMembers().size()) + " : " + channelIt->getTopic(), client.getFd());
+			sendMessage(formatMessage(client, RPL_LIST) + " " + channelIt->getName() + " " + to_string(channelIt->getMembers().size()) + " " + channelIt->getTopic(), client.getFd());
 		sendMessage(formatMessage(client, RPL_LISTEND) + " :End of list", client.getFd());
 		return;
 	}
@@ -468,7 +467,7 @@ void Manager::listCmd(Client &client)
 	for (std::vector<std::string>::iterator it = chans.begin(); it != chans.end(); it++)
 	{
 		std::vector<Channel>::iterator channelIt = getChnlByName(*it);
-		sendMessage(formatMessage(client, RPL_LIST) + " " + to_string(channelIt->getMembers().size()) + ": " + channelIt->getTopic(), client.getFd());
+		sendMessage(formatMessage(client, RPL_LIST) + " " + to_string(channelIt->getMembers().size()) + " " + channelIt->getTopic(), client.getFd());
 	}
 	sendMessage(formatMessage(client, RPL_LISTEND) + " :End of list", client.getFd());
 }

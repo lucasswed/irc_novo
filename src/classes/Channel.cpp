@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 16:52:20 by ralves-g          #+#    #+#             */
-/*   Updated: 2024/01/04 16:02:15 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2024/01/04 16:25:16 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,12 +107,9 @@ void Channel::setTopic(std::string topic)
 
 int Channel::getMode(std::string mode) const
 {
-	std::clog << "getMode: " << mode << std::endl;
 	for (std::map<std::string, int>::const_iterator it = _modes.begin(); it != _modes.end(); it++)
-		std::clog << it->first << " " << it->second << std::endl;
-	// for (std::map<std::string, bool>::const_iterator it = _modes.begin(); it != _modes.end(); it++)
-	// 	if (it->first == mode)
-	// 		return (it->second);
+		if (it->first == mode)
+			return (it->second);
 	return (-1);
 }
 
