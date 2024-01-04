@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Manager.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:13:17 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/04 17:46:53 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2024/01/04 23:16:26 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,18 +16,19 @@
 std::vector<Client> Manager::_clients;
 std::vector<Channel> Manager::_channels;
 std::map<std::string, cmdFunction> Manager::_cmdMap;
+std::map<std::string, modeFunction> Manager::_modeMap;
 std::string Manager::_hostname = "localhost";
 std::string Manager::_servername = "irc.server.com";
 
-void Manager::on(std::string event, cmdFunction function)
+void Manager::onCmd(std::string event, cmdFunction function)
 {
 	_cmdMap.insert(std::pair<std::string, cmdFunction>(event, function));
 }
 
-// void Manager::on(std::string event, modeFunction function)
-// {
-// 	_modeMap.insert(std::pair<std::string, modeFunction>(event, function));
-// }
+void Manager::onMode(std::string event, modeFunction function)
+{
+	_modeMap.insert(std::pair<std::string, modeFunction>(event, function));
+}
 
 std::string Manager::formatMessage(const Client &client)
 {
@@ -37,24 +38,25 @@ std::string Manager::formatMessage(const Client &client)
 void Manager::fillMaps(void)
 {
 	// COMMANDS
-	on("WHO", &Manager::whoCmd);
-	on("JOIN", &Manager::joinCmd);
-	on("QUIT", &Manager::quitCmd);
-	on("KICK", &Manager::kickCmd);
-	on("PART", &Manager::partCmd);
-	on("MODE", &Manager::modeCmd);
-	on("TOPIC", &Manager::topicCmd);
-	on("INVITE", &Manager::inviteCmd);
-	on("PRIVMSG", &Manager::privmsgCmd);
-	on("LIST", &Manager::listCmd);
-	on("LUSERS", &Manager::lusersCmd);
-	on("NICK", &Manager::nickCmd);
+	onCmd("WHO", &Manager::whoCmd);
+	onCmd("JOIN", &Manager::joinCmd);
+	onCmd("QUIT", &Manager::quitCmd);
+	onCmd("KICK", &Manager::kickCmd);
+	onCmd("PART", &Manager::partCmd);
+	onCmd("MODE", &Manager::modeCmd);
+	onCmd("TOPIC", &Manager::topicCmd);
+	onCmd("INVITE", &Manager::inviteCmd);
+	onCmd("PRIVMSG", &Manager::privmsgCmd);
+	onCmd("LIST", &Manager::listCmd);
+	onCmd("LUSERS", &Manager::lusersCmd);
+	onCmd("NICK", &Manager::nickCmd);
+	
 	// MODES
-	//  on("INVITE", &);
-	//  on("TOPIC", &);
-	//  on("KEY", &);
-	//  on("OPERATOR", &);
-	//  on("LIMIT", &);
+	onMode("INVITE", &Manager::inviteMode);
+	onMode("TOPIC", &Manager::topicMode);
+	onMode("KEY", &Manager::keyMode);
+	onMode("OPERATOR", &Manager::operatorMode);
+	onMode("LIMIT", &Manager::limitMode);
 }
 
 void Manager::whoCmd(Client &client)
@@ -570,8 +572,187 @@ void Manager::privmsgCmd(Client &client)
 	}
 }
 
+std::string Manager::checkMode(std::string cmd)
+{
+	if (cmd.size() != 2 || (cmd[0] != '-' && cmd[0] != '+'))
+		return ("");
+	if (cmd[1] == 'i')
+		return ("INVITE");
+	if (cmd[1] == 't')
+		return ("TOPIC");
+	if (cmd[1] == 'k')
+		return ("KEY");
+	if (cmd[1] == 'o')
+		return ("OPERATOR");
+	if (cmd[1] == 'l')
+		return ("LIMIT");
+	return ("");
+}
+
 void Manager::modeCmd(Client &client)
 {
+	std::vector<std::string> cmd = client.getCmd();
+	if (cmd.size() < 3)
+	{
+		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " MODE :Not enought paramaters", client.getFd());
+		return ;
+	}
+	std::string mode = checkMode(cmd[2]);
+	if (mode.size() == 0)
+	{
+		sendMessage(formatMessage(client, UMODEUNKNOWNFLAG) + cmd[2] + " :Unknown mode", client.getFd());
+		return ;	if (cmd.size() < 3)
+	{
+		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " MODE :Not enought paramaters", client.getFd());
+		return ;
+	}
+	}
+	_modeMap[mode](client);
+}
+
+void Manager::inviteMode(Client &client)
+{
+	std::vector<std::string> cmd = client.getCmd();
+	std::vector<Channel>::iterator target = getChnlByName(cmd[1]);
+	if (target == _channels.end())
+	{
+		sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + client.getCmd()[1] + " :No such channel", client.getFd());
+		return ;
+	}
+	if(!target->isMember(client.getFd()))
+	{
+		sendMessage(formatMessage(client, NOTONCHANNEL) + " " + target->getName() + " :You're not on that channel", client.getFd());
+		return ;
+	}
+	if (!target->isOperator(client.getFd()))
+	{
+		sendMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + target->getName() + " :You're not channel operator", client.getFd());
+		return ;
+	}
+	if (cmd[2][0] == '-')
+	{
+		target->setMode("INVITE", false);
+		sendMessage(formatMessage(client, CHANNELMODEIS) + " " + target->getName() + " :Channel Invite mode was unset by " + client.getNickname(), client.getFd());
+	}
+	else
+	{
+		target->setMode("INVITE", true);
+		sendMessage(formatMessage(client, CHANNELMODEIS) + " " + target->getName() + " :Channel Invite mode was set by " + client.getNickname(), client.getFd());
+	}
+}
+
+void Manager::topicMode(Client &client)
+{
+	std::vector<std::string> cmd = client.getCmd();
+	std::vector<Channel>::iterator target = getChnlByName(cmd[1]);
+	if (target == _channels.end())
+	{
+		sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + client.getCmd()[1] + " :No such channel", client.getFd());
+		return ;
+	}
+	if(!target->isMember(client.getFd()))
+	{
+		sendMessage(formatMessage(client, NOTONCHANNEL) + " " + target->getName() + " :You're not on that channel", client.getFd());
+		return ;
+	}
+	if (!target->isOperator(client.getFd()))
+	{
+		sendMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + target->getName() + " :You're not channel operator", client.getFd());
+		return ;
+	}
+	if (cmd[2][0] == '-')
+	{
+		target->setMode("TOPIC", false);
+		sendMessage(formatMessage(client, CHANNELMODEIS) + " " + target->getName() + " :Channel Topic mode was unset by " + client.getNickname(), client.getFd());
+	}
+	else
+	{
+		target->setMode("TOPIC", true);
+		sendMessage(formatMessage(client, CHANNELMODEIS) + " " + target->getName() + " :Channel Topic mode was set by " + client.getNickname(), client.getFd());
+	}
+}
+
+void Manager::keyMode(Client &client)
+{
+	std::vector<std::string> cmd = client.getCmd();
+	if (cmd.size() < 4 && cmd[2][0] != '-')
+	{
+		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " MODE :Not enought paramaters", client.getFd());
+		return ;
+	}
+	std::vector<Channel>::iterator target = getChnlByName(cmd[1]);
+	if (target == _channels.end())
+	{
+		sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + client.getCmd()[1] + " :No such channel", client.getFd());
+		return ;
+	}
+	if(!target->isMember(client.getFd()))
+	{
+		sendMessage(formatMessage(client, NOTONCHANNEL) + " " + target->getName() + " :You're not on that channel", client.getFd());
+		return ;
+	}
+	if (!target->isOperator(client.getFd()))
+	{
+		sendMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + target->getName() + " :You're not channel operator", client.getFd());
+		return ;
+	}
+	if (cmd[2][0] == '-')
+	{
+		target->setMode("KEY", false);
+		sendMessage(formatMessage(client, CHANNELMODEIS) + " " + target->getName() + " :Channel key was unset by " + client.getNickname(), client.getFd());
+	}
+	else
+	{
+		if (target->getMode("KEY"))
+		{
+			sendMessage(formatMessage(client, ERR_KEYSET) + " " + target->getName() + " :Channel key already set", client.getFd());
+			return ;
+		}
+		target->setMode("KEY", true);
+		target->setKey(cmd[3]);
+		sendMessage(formatMessage(client, CHANNELMODEIS) + " " + target->getName() + " :Channel key was set to " + cmd[3] + " by " + client.getNickname(), client.getFd());
+	}
+}
+
+void Manager::limitMode(Client &client)
+{
+	std::vector<std::string> cmd = client.getCmd();
+	if (cmd.size() < 4 && cmd[2][0] != '-')
+	{
+		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " MODE :Not enought paramaters", client.getFd());
+		return ;
+	}
+	std::vector<Channel>::iterator target = getChnlByName(cmd[1]);
+	if (target == _channels.end())
+	{
+		sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + client.getCmd()[1] + " :No such channel", client.getFd());
+		return ;
+	}
+	if(!target->isMember(client.getFd()))
+	{
+		sendMessage(formatMessage(client, NOTONCHANNEL) + " " + target->getName() + " :You're not on that channel", client.getFd());
+		return ;
+	}
+	if (!target->isOperator(client.getFd()))
+	{
+		sendMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + target->getName() + " :You're not channel operator", client.getFd());
+		return ;
+	}
+	if (cmd[2][0] == '-')
+	{
+		target->setMode("LIMIT", false);
+		sendMessage(formatMessage(client, CHANNELMODEIS) + " " + target->getName() + " :Channel limit mode was unset by " + client.getNickname(), client.getFd());
+	}
+	else
+	{
+		target->setMode("LIMIT", true);
+		target->setClientLimit(std::atoi(cmd[3].c_str()));
+		sendMessage(formatMessage(client, CHANNELMODEIS) + " " + target->getName() + " :Channel limit mode was set to " + cmd[3] + " by " + client.getNickname(), client.getFd());
+	}
+}
+
+void Manager::operatorMode(Client &client)
+{
 	(void)client;
-	std::clog << LIGHTPURPLE << "ENTREI FDP" << RESET << std::endl;
+	std::clog << LIGHTPURPLE << "ENTRI NO OPERATERMODE FUNCTION SEU PAU NO CU" << RESET << std::endl;
 }
