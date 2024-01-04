@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Manager.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/01/04 16:46:59 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2024/01/04 17:27:15 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,12 +71,12 @@ public:
 	static void kickCmd(Client &client);
 	static void partCmd(Client &client);
 	static void modeCmd(Client &client);
-	static void topicCmd(Client &client);
+	static void topicCmd(Client &client); //Falta ver com modes ativos
 	static void inviteCmd(Client &client);
 	static void privmsgCmd(Client &client);
-	static void listCmd(Client &client);
-	static void lusersCmd(Client &client);
-	static void nickCmd(Client &client);
+	static void listCmd(Client &client); //Ta bom
+	static void lusersCmd(Client &client); //Ta bom
+	static void nickCmd(Client &client); //Ta bom
 
 	static void whoCmd(Client &client);
 };
