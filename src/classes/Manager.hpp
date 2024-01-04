@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Manager.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/01/04 15:42:47 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2024/01/04 17:27:15 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ public:
 	static std::string formatMessage(const Client &client);
 	static std::string formatMessage(Client const &client, std::string const &code);
 	static void fillMaps(void);
+	static void setChannOpps(Client &client);
 
 	static void createChannel(std::string name);
 	static void joinChannel(std::string channel, std::string key, Client client);
@@ -70,12 +71,12 @@ public:
 	static void kickCmd(Client &client);
 	static void partCmd(Client &client);
 	static void modeCmd(Client &client);
-	static void topicCmd(Client &client);
+	static void topicCmd(Client &client); //Falta ver com modes ativos
 	static void inviteCmd(Client &client);
 	static void privmsgCmd(Client &client);
-	static void listCmd(Client &client);
-	static void lusersCmd(Client &client);
-	static void nickCmd(Client &client);
+	static void listCmd(Client &client); //Ta bom
+	static void lusersCmd(Client &client); //Ta bom
+	static void nickCmd(Client &client); //Ta bom
 
 	static void whoCmd(Client &client);
 };

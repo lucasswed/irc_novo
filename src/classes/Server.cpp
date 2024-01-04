@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/20 16:39:01 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/04 14:52:34 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2024/01/04 17:20:33 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,22 @@ bool Server::signUpClient(Client &client)
 	return (true);
 }
 
+bool Server::existCommand(std::string const &cmd)
+{
+	if (Manager::getCmdMap().find(cmd) == Manager::getCmdMap().end())
+		return (false);
+	return (true);
+}
+
 void Server::runCmd(Client &client)
 {
 	std::cout << BLUE << "Running command..." << RESET << std::endl;
-	std::string cmd = client.getCmd()[0];
+	std::string cmd = toUP(client.getCmd()[0]);
+	if (existCommand(cmd) == false)
+	{
+		std::cout << RED << "Command not found!" << RESET << std::endl;
+		return;
+	}
 	if (client.getCmd().size() == 0 || client.getCmd()[0].empty())
 		return;
 	std::cout << LIGHTPURPLE << "DEBUG: " + Manager::getCmdMap().find(cmd)->first << RESET << std::endl;
@@ -68,6 +80,8 @@ void Server::messageHandler(int socket, int read, char *buffer)
 			this->signUpClient(client);
 		else
 			this->runCmd(client);
+		if (client.getLogged() && !client.getRegistered())
+			Manager::setChannOpps(client);
 		client.temp.clear();
 	}
 }
