@@ -6,7 +6,7 @@
 /*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:13:17 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/04 17:06:12 by pcampos-         ###   ########.fr       */
+/*   Updated: 2024/01/04 17:25:14 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -483,13 +483,13 @@ void Manager::listCmd(Client &client)
 void Manager::lusersCmd(Client &client)
 {
 	sendMessage(formatMessage(client, LUSERCLIENT) + " :There are " + to_string(_clients.size()) + " users on 1 server", client.getFd());
-	int ops;
+	int ops = 0;
 	for (std::vector<Channel>::iterator channelIt = _channels.begin(); channelIt != _channels.end(); channelIt++)
 		ops += channelIt->getOperators().size();
 	if (ops > 0)
-		sendMessage(formatMessage(client, LUSEROP) + to_string(ops) + " :operator(s) online", client.getFd());
+		sendMessage(formatMessage(client, LUSEROP) + " " + to_string(ops) + " :operator(s) online", client.getFd());
 	if (_channels.size() > 0)
-		sendMessage(formatMessage(client, LUSERCHANNELS) + to_string(_channels.size()) + " :channels formed", client.getFd());
+		sendMessage(formatMessage(client, LUSERCHANNELS) + " " + to_string(_channels.size()) + " :channels formed", client.getFd());
 }
 
 void Manager::nickCmd(Client &client)
