@@ -6,7 +6,7 @@
 /*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:13:17 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/04 23:16:26 by pcampos-         ###   ########.fr       */
+/*   Updated: 2024/01/04 23:18:11 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ std::vector<Channel> Manager::_channels;
 std::map<std::string, cmdFunction> Manager::_cmdMap;
 std::map<std::string, modeFunction> Manager::_modeMap;
 std::string Manager::_hostname = "localhost";
-std::string Manager::_servername = "irc.server.com";
+std::string Manager::_servername = "irc.server.gg";
 
 void Manager::onCmd(std::string event, cmdFunction function)
 {
@@ -362,7 +362,7 @@ void Manager::quitCmd(Client &client)
 {
 	for (size_t i = 0; i < _channels.size(); i++)
 		if (_channels[i].isInvited(client.getFd()) || _channels[i].isMember(client.getFd()))
-		_channels[i].kickClient(client.getFd());
+			_channels[i].kickClient(client.getFd());
 	sendMessage(formatMessage(client, "Quit: Gone to have lunch"), client.getFd());
 }
 
