@@ -6,7 +6,7 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/01/04 15:42:47 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2024/01/04 16:46:59 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ public:
 	static std::string formatMessage(const Client &client);
 	static std::string formatMessage(Client const &client, std::string const &code);
 	static void fillMaps(void);
+	static void setChannOpps(Client &client);
 
 	static void createChannel(std::string name);
 	static void joinChannel(std::string channel, std::string key, Client client);
