@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   messageCodes.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/16 10:27:02 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/03 18:55:41 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/04 17:21:44 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 #define MESSAGECODES_HPP
 
 #define WELCOME_MESSAGE "001"
+#define RPL_YOURHOST "002"
+#define RPL_CREATED "003"
 #define CHANNEL_OPPS "005"
 #define LUSERCLIENT "251"
 #define LUSEROP "252"

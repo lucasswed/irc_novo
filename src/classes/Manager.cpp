@@ -6,7 +6,7 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:13:17 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/04 16:49:18 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2024/01/04 17:44:12 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,8 @@ void Manager::removeClient(int fd)
 void Manager::setChannOpps(Client &client)
 {
 	Manager::sendMessage(Manager::formatMessage(client, WELCOME_MESSAGE) + " :Welcome to the Darjest Region of the Internet", client.getFd());
+	Manager::sendMessage(Manager::formatMessage(client, RPL_YOURHOST) + " :Your host is " + _hostname + ", running version 1.0", client.getFd());
+	Manager::sendMessage(Manager::formatMessage(client, RPL_CREATED) + " :This server was created sometime in 2023", client.getFd());
 	Manager::sendMessage(Manager::formatMessage(client, CHANNEL_OPPS) + " :CHANTYPES=#", client.getFd());
 	Manager::sendMessage(Manager::formatMessage(client, CHANNEL_OPPS) + " :CHANMODES=i,t,k,o,l", client.getFd());
 	client.setRegistered(true);
