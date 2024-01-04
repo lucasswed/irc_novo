@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Manager.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:13:17 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/04 16:11:57 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2024/01/04 17:32:36 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,7 +216,7 @@ void Manager::topicCmd(Client &client)
 	std::vector<std::string> cmd = client.getCmd();
 	if (cmd.size() < 2)
 	{
-		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " COMMAND ERROR: Not enought paramaters", client.getFd());
+		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " TOPIC :Not enought paramaters", client.getFd());
 		return;
 	}
 	std::vector<Channel>::iterator channelIt = getChnlByName(cmd[1]);
@@ -266,7 +266,6 @@ void Manager::joinChannel(std::string channel, std::string key, Client client)
 			sendMessage(formatMessage(client, RPL_TOPIC) + " " + channel + " :No topic is set", client.getFd());
 		else
 			sendMessage(formatMessage(client, RPL_NOTOPIC) + " " + channel + " :" + getChnlByName(channel)->getTopic(), client.getFd());
-
 		return;
 	}
 	if (itr->getMode("INVITE") == 1)
@@ -304,6 +303,15 @@ void Manager::joinChannel(std::string channel, std::string key, Client client)
 void Manager::joinCmd(Client &client)
 {
 	std::vector<std::string> channelsToEnter = ft_split(client.getCmd()[1], ",");
+	for (size_t i = 0; i < channelsToEnter.size(); i++)
+	{
+		std::clog << (channelsToEnter[i][0] != '#') << " <--- test" << std::endl;
+		if (channelsToEnter[i].length() <= 1 || channelsToEnter[i][0] != '#')
+		{
+			sendMessage(formatMessage(client, NEEDMOREPARAMS) + "JOIN" + " :Not enought paramaters", client.getFd());
+			return;
+		}
+	}
 	if (channelsToEnter.size() == 1 && channelsToEnter[0] == "0")
 	{
 		for (size_t i = 0; i < _channels.size(); i++)
@@ -341,6 +349,7 @@ void Manager::joinCmd(Client &client)
 void Manager::quitCmd(Client &client)
 {
 	for (size_t i = 0; i < _channels.size(); i++)
+		if (_channels[i].isInvited(client.getFd()) || _channels[i].isMember(client.getFd()))
 		_channels[i].kickClient(client.getFd());
 	sendMessage(formatMessage(client, "Quit: Gone to have lunch"), client.getFd());
 }
@@ -423,7 +432,7 @@ void Manager::inviteCmd(Client &client)
 
 void Manager::partCmd(Client &client)
 {
-	if (client.getCmd().size() != 2)
+	if (client.getCmd().size() <= 2)
 	{
 		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " " + client.getCmd()[0] + " :Not enough parameters", client.getFd());
 		return;
@@ -433,11 +442,15 @@ void Manager::partCmd(Client &client)
 	{
 		if (getChnlByName(channels[i]) == _channels.end())
 			sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + channels[i] + " :No such channel", client.getFd());
-		else if (!getChnlByName(channels[i])->isMember(client.getFd()))
+		else if (!(getChnlByName(channels[i])->isMember(client.getFd())))
+		{
+			std::clog << "Tested with " + channels[i] << " and is " << !(getChnlByName(channels[i])->isMember(client.getFd())) << std::endl;
 			sendMessage(formatMessage(client, USERNOTINCHANNEL) + " " + client.getNickname() + " " + channels[i] + " :They aren't on that channel", client.getFd());
+		}
 		else
 		{
 			getChnlByName(channels[i])->kickClient(client.getFd());
+			sendMessage(formatMessage(client) + " PART " + channels[i], client.getFd());
 			// msg
 		}
 	}

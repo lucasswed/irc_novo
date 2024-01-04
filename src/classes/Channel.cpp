@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 16:52:20 by ralves-g          #+#    #+#             */
-/*   Updated: 2024/01/04 16:02:15 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2024/01/04 17:31:56 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,12 +107,12 @@ void Channel::setTopic(std::string topic)
 
 int Channel::getMode(std::string mode) const
 {
-	std::clog << "getMode: " << mode << std::endl;
+	// std::clog << "getMode: " << mode << std::endl;
+	// for (std::map<std::string, int>::const_iterator it = _modes.begin(); it != _modes.end(); it++)
+	// 	std::clog << it->first << " " << it->second << std::endl;
 	for (std::map<std::string, int>::const_iterator it = _modes.begin(); it != _modes.end(); it++)
-		std::clog << it->first << " " << it->second << std::endl;
-	// for (std::map<std::string, bool>::const_iterator it = _modes.begin(); it != _modes.end(); it++)
-	// 	if (it->first == mode)
-	// 		return (it->second);
+		if (it->first == mode)
+			return (it->second);
 	return (-1);
 }
 
@@ -150,6 +150,8 @@ void Channel::addOperator(int client)
 {
 	if (!isOperator(client))
 		_operators.push_back(client);
+	if (!isMember(client))
+		_members.push_back(client);
 }
 void Channel::Invite(int client)
 {
@@ -166,16 +168,16 @@ void Channel::setMode(std::string mode, bool flag)
 void Channel::kickClient(int client)
 {
 	if (isOperator(client))
-		for (std::vector<int>::iterator itr = _operators.begin(); itr != _operators.end(); itr++)
-			if (*itr == client)
+		for (std::vector<int>::iterator itr = _operators.begin(); _operators.empty() && itr != _operators.end(); itr++)
+			if (itr != _operators.end() && *itr == client)
 				_operators.erase(itr);
 	if (isInvited(client))
-		for (std::vector<int>::iterator itr = _invited.begin(); itr != _invited.end(); itr++)
-			if (*itr == client)
+		for (std::vector<int>::iterator itr = _invited.begin(); _invited.empty() && itr != _invited.end(); itr++)
+			if (itr != _operators.end() && *itr == client)
 				_invited.erase(itr);
 	if (isMember(client))
-		for (std::vector<int>::iterator itr = _members.begin(); itr != _members.end(); itr++)
-			if (*itr == client)
+		for (std::vector<int>::iterator itr = _members.begin(); _members.empty() && itr != _members.end(); itr++)
+			if (itr != _operators.end() && *itr == client)
 				_members.erase(itr);
 }
 
