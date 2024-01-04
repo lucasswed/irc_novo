@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:24:38 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/02 11:54:53 by pcampos-         ###   ########.fr       */
+/*   Updated: 2024/01/04 16:50:01 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,11 @@ bool Client::getPassChecked(void) const
 	return (this->_passChecked);
 }
 
+bool Client::getRegistered(void) const
+{
+	return (this->_registered);
+}
+
 void Client::setLogged(bool value)
 {
 	this->_logged = value;
@@ -88,4 +93,9 @@ void Client::setCmd(std::vector<std::string> cmd)
 {
 	this->_cmd.clear();
 	this->_cmd = cmd;
+}
+
+void Client::setRegistered(bool value)
+{
+	this->_registered = value;
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 19:46:22 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/03 11:00:41 by pcampos-         ###   ########.fr       */
+/*   Updated: 2024/01/04 16:27:27 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ private:
 	void messageHandler(int socket, int read, char *buffer);
 	bool signUpClient(Client &client);
 	void runCmd(Client &client);
+	bool existCommand(std::string const &cmd);
 
 public:
 	Server(std::string const &port, std::string const &password);
