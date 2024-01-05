@@ -6,7 +6,7 @@
 /*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/01/04 22:35:26 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/05 01:21:00 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@
 #include <sys/socket.h>
 
 typedef void (*cmdFunction)(Client &client);
-// typedef void (*modeFunction)(Channel &channel, Client &client);
+typedef void (*modeFunction)(Client &client);
 
 class Channel;
 
@@ -40,10 +40,10 @@ private:
 	static std::string _hostname;
 	static std::string _servername;
 	static std::map<std::string, cmdFunction> _cmdMap;
-	// static std::map<std::string, modeFunction> _modeMap;
+	static std::map<std::string, modeFunction> _modeMap;
 
-	static void on(std::string event, cmdFunction function);
-	// static void on(std::string event, modeFunction function);
+	static void onCmd(std::string event, cmdFunction function);
+	static void onMode(std::string event, modeFunction function);
 
 public:
 	static bool addClient(int fd);
@@ -67,21 +67,28 @@ public:
 	static void privmsgClients(std::vector<std::string> const &recipients, std::string msg, Client &client);
 	static void privmsgChannels(std::vector<std::string> const &recipients, std::string msg, Client &client);
 	static void msgToChannel(std::string channelName, std::string msg, Client &client);
+	static std::string checkMode(std::string cmd);
 
 	// Cmd Functions
-	static void joinCmd(Client &client);
-	static void quitCmd(Client &client);
-	static void kickCmd(Client &client);
-	static void partCmd(Client &client);
-	static void modeCmd(Client &client);
+	static void joinCmd(Client &client); //Falta ver as passes e com modes
+	static void quitCmd(Client &client); //Ta bom
+	static void kickCmd(Client &client); //To Do
+	static void partCmd(Client &client); //To Test
+	static void modeCmd(Client &client); //A ser feito
 	static void topicCmd(Client &client); //Falta ver com modes ativos
-	static void inviteCmd(Client &client);
-	static void privmsgCmd(Client &client);
+	static void inviteCmd(Client &client); //Quem convida ta bem, o convite nao chega ao outro user e precisa de modes para testar
+	static void privmsgCmd(Client &client); //To Test
 	static void listCmd(Client &client); //Ta bom
 	static void lusersCmd(Client &client); //Ta bom
 	static void nickCmd(Client &client); //Ta bom
+	static void whoCmd(Client &client); //Nem existe ainda
 
-	static void whoCmd(Client &client);
+	// Mode Functions
+	static void inviteMode(Client &client);
+	static void topicMode(Client &client);
+	static void keyMode(Client &client);
+	static void operatorMode(Client &client);
+	static void limitMode(Client &client);
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/16 10:27:02 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/04 23:02:08 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/05 01:21:11 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 #define MESSAGECODES_HPP
 
 #define WELCOME_MESSAGE "001"
+#define RPL_YOURHOST "002"
+#define RPL_CREATED "003"
 #define CHANNEL_OPPS "005"
 #define LUSERCLIENT "251"
 #define LUSEROP "252"
@@ -54,5 +56,6 @@
 #define NOPRIVILEGES "481"
 #define CHANOPRIVSNEEDED "482"
 #define UMODEUNKNOWNFLAG "501"
+#define ERR_KEYSET "467"
 
 #endif

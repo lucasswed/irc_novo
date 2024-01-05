@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/20 16:39:01 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/04 17:20:33 by pcampos-         ###   ########.fr       */
+/*   Updated: 2024/01/04 23:02:44 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,22 +40,53 @@ bool Server::signUpClient(Client &client)
 
 bool Server::existCommand(std::string const &cmd)
 {
-	if (Manager::getCmdMap().find(cmd) == Manager::getCmdMap().end())
-		return (false);
-	return (true);
+	if (cmd == "WHO")
+		return (true);
+	if (cmd == "JOIN")
+		return (true);
+	if (cmd == "QUIT")
+		return (true);
+	if (cmd == "KICK")
+		return (true);
+	if (cmd == "PART")
+		return (true);
+	if (cmd == "MODE")
+		return (true);
+	if (cmd == "TOPIC")
+		return (true);
+	if (cmd == "INVITE")
+		return (true);
+	if (cmd == "PRIVMSG")
+		return (true);
+	if (cmd == "LIST")
+		return (true);
+	if (cmd == "LUSERS")
+		return (true);
+	if (cmd == "NICK")
+		return (true);
+	// MODES
+	//  on("INVITE", &);
+	//  on("TOPIC", &);
+	//  on("KEY", &);
+	//  on("OPERATOR", &);
+	//  on("LIMIT", &);
+
+	return (false);
 }
 
 void Server::runCmd(Client &client)
 {
-	std::cout << BLUE << "Running command..." << RESET << std::endl;
+	std::cout << BLUE << "Running command..." << client.getCmd()[0] << RESET << std::endl;
 	std::string cmd = toUP(client.getCmd()[0]);
-	if (existCommand(cmd) == false)
-	{
-		std::cout << RED << "Command not found!" << RESET << std::endl;
-		return;
-	}
 	if (client.getCmd().size() == 0 || client.getCmd()[0].empty())
 		return;
+	if (!existCommand(cmd))
+	{
+		std::cerr << RED << "COMMAND NOT FOUND" << RESET << std::endl;
+		std::string msg = ":irc.server.com 421 " + cmd + " :Unknown command";
+		Manager::sendMessage(msg, client.getFd());
+		return;
+	}
 	std::cout << LIGHTPURPLE << "DEBUG: " + Manager::getCmdMap().find(cmd)->first << RESET << std::endl;
 	Manager::getCmdMap()[cmd](client);
 }
