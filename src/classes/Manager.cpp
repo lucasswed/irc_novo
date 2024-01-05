@@ -6,7 +6,7 @@
 /*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:13:17 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/05 05:56:33 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/05 07:17:38 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,7 +189,6 @@ bool Manager::checkNick(Client const &client)
 	if (!isNickValid(client.getNickname()))
 	{
 		std::cout << RED << "Nickname wrong formatted" << RESET << std::endl;
-		// sendMessage() to the client with the error nick not valid
 		sendMessage(formatMessage(client, ERRONEUSNICKNAME) + " :Erroneus nickname", client.getFd());
 		return (false);
 	}
@@ -200,7 +199,6 @@ bool Manager::checkNick(Client const &client)
 		if (it->getNickname() == client.getNickname())
 		{
 			std::cout << RED << "Nickname already in use" << RESET << std::endl;
-			// sendMessage() to the client with the nick in use error
 			sendMessage(formatMessage(client, NICKNAMEINUSE) + " :Nickname is already in use", client.getFd());
 			return (false);
 		}
@@ -320,7 +318,6 @@ void Manager::joinChannel(std::string channel, std::string key, Client client)
 	{
 		createChannel(channel);
 		getChnlByName(channel)->addOperator(client.getFd());
-		// sendMessage(formatMessage(client, "Successfully joined " + channel), client.getFd());
 		sendMessage(formatMessage(client) + " JOIN " + channel, client.getFd());
 		if (getChnlByName(channel)->getMode("TOPIC") == 1)
 			sendMessage(formatMessage(client, RPL_TOPIC) + " " + channel + " :No topic is set", client.getFd());
@@ -351,7 +348,6 @@ void Manager::joinChannel(std::string channel, std::string key, Client client)
 	else
 	{
 		itr->addMember(client.getFd());
-		// sendMessage(formatMessage(client, "Successfully joined " + channel), client.getFd());
 		sendMessage(formatMessage(client) + " JOIN " + channel, client.getFd());
 		if (getChnlByName(channel)->getMode("TOPIC") == 1)
 			sendMessage(formatMessage(client, RPL_TOPIC) + " " + channel + " :No topic is set", client.getFd());
@@ -361,13 +357,23 @@ void Manager::joinChannel(std::string channel, std::string key, Client client)
 	}
 }
 
+bool hasChar(std::string str, char c)
+{
+	for (size_t i = 0; i < str.length(); i++)
+	{
+		if (str[i] == c)
+			return true;
+	}
+	return false;
+}
+
 void Manager::joinCmd(Client &client)
 {
 	std::vector<std::string> channelsToEnter = ft_split(client.getCmd()[1], ",");
 	for (size_t i = 0; i < channelsToEnter.size(); i++)
 	{
-		std::clog << (channelsToEnter[i][0] != '#') << " <--- test" << std::endl;
-		if (channelsToEnter[i].length() <= 1 || channelsToEnter[i][0] != '#')
+		// std::clog << (channelsToEnter[i][0] != '#') << " <--- test" << std::endl;
+		if (channelsToEnter[i].length() <= 1 || channelsToEnter[i][0] != '#' || (hasChar(channelsToEnter[i].substr(1, channelsToEnter[i].length()), '#')))
 		{
 			sendMessage(formatMessage(client, NEEDMOREPARAMS) + "JOIN" + " :Not enought paramaters", client.getFd());
 			return;
@@ -509,7 +515,9 @@ void Manager::inviteCmd(Client &client)
 		return;
 	}
 	getChnlByName(client.getCmd()[2])->Invite(getFdByNick(client.getCmd()[1]));
+	
 	sendMessage(formatMessage(client, INVITING) + " " + client.getCmd()[1] + " " + client.getCmd()[2], client.getFd());
+	sendMessage(formatMessage(client) + " INVITE " + client.getCmd()[1] + " " + client.getCmd()[2], getFdByNick(client.getCmd()[1]));
 }
 
 void Manager::partCmd(Client &client)

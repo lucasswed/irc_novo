@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/20 16:39:01 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/05 01:29:32 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2024/01/05 06:55:22 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,7 @@ void Server::messageHandler(int socket, int read, char *buffer)
 		if (msg.find('\n') == std::string::npos)
 		{
 			client.temp += msg;
+			std::cout << RED << msg << RESET << std::endl;
 			return;
 		}
 		client.temp += msg;

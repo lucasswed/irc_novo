@@ -6,7 +6,7 @@
 /*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 16:52:20 by ralves-g          #+#    #+#             */
-/*   Updated: 2024/01/05 05:56:41 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/05 06:02:04 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,7 +221,7 @@ void Channel::messageAll(std::string msg, int senderFd)
 
 void Channel::removeOperator(int fd)
 {
-	for (std::vector<int>::iterator itr = _operators.begin(); _operators.empty() && itr != _operators.end(); itr++)
+	for (std::vector<int>::iterator itr = _operators.begin(); !_operators.empty() && itr != _operators.end(); itr++)
 	{
 		if (itr != _operators.end() && *itr == fd)
 		{
