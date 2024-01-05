@@ -6,7 +6,7 @@
 /*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 16:52:20 by ralves-g          #+#    #+#             */
-/*   Updated: 2024/01/04 17:39:05 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/05 05:06:06 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,20 +163,44 @@ void Channel::setMode(std::string mode, bool flag)
 		_modes.find(mode)->second = flag;
 }
 
+void Channel::partClient(int client)
+{
+	if (isMember(client))
+		for (std::vector<int>::iterator itr = _members.begin(); !_members.empty() && itr != _members.end(); itr++)
+			if (itr != _members.end() && *itr == client)
+			{
+				std::clog << "Erasing member" + Manager::getNickByFd(client) << std::endl;
+				_members.erase(itr);
+				break;
+			}
+}
+
 void Channel::kickClient(int client)
 {
 	if (isOperator(client))
-		for (std::vector<int>::iterator itr = _operators.begin(); _operators.empty() && itr != _operators.end(); itr++)
+		for (std::vector<int>::iterator itr = _operators.begin(); !_operators.empty() && itr != _operators.end(); itr++)
 			if (itr != _operators.end() && *itr == client)
+			{
 				_operators.erase(itr);
+				std::clog << "Erasing operator" + Manager::getNickByFd(client) << std::endl;
+				break;
+			}
 	if (isInvited(client))
-		for (std::vector<int>::iterator itr = _invited.begin(); _invited.empty() && itr != _invited.end(); itr++)
-			if (itr != _operators.end() && *itr == client)
+		for (std::vector<int>::iterator itr = _invited.begin(); !_invited.empty() && itr != _invited.end(); itr++)
+			if (itr != _invited.end() && *itr == client)
+			{
+				std::clog << "Erasing invited" + Manager::getNickByFd(client) << std::endl;
 				_invited.erase(itr);
+				break;
+			}
 	if (isMember(client))
-		for (std::vector<int>::iterator itr = _members.begin(); _members.empty() && itr != _members.end(); itr++)
-			if (itr != _operators.end() && *itr == client)
+		for (std::vector<int>::iterator itr = _members.begin(); !_members.empty() && itr != _members.end(); itr++)
+			if (itr != _members.end() && *itr == client)
+			{
+				std::clog << "Erasing member" + Manager::getNickByFd(client) << std::endl;
 				_members.erase(itr);
+				break;
+			}
 }
 
 void Channel::messageAll(std::string msg)
