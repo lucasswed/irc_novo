@@ -6,7 +6,7 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 23:44:14 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/04 13:02:13 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2024/01/05 02:27:09 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 std::vector<std::string> ft_split(std::string const &str, std::string const &del)
 {
@@ -54,3 +55,10 @@ std::string to_string(size_t const &size)
 	ss << size;
 	return (ss.str());
 }
+
+// void signalHandler(int sig)
+// {
+// 	(void)sig;
+// 	std::cout << "signal received" << std::endl;
+// 	exit(0);
+// }
