@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Manager.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/01/05 01:21:00 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/05 03:45:03 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,10 @@ public:
 	static void privmsgChannels(std::vector<std::string> const &recipients, std::string msg, Client &client);
 	static void msgToChannel(std::string channelName, std::string msg, Client &client);
 	static std::string checkMode(std::string cmd);
+	static void showModes(Client &client);
+	static int getAllOps();
+	static bool inVector(std::vector<int> ops, int target);
+
 
 	// Cmd Functions
 	static void joinCmd(Client &client); //Falta ver as passes e com modes

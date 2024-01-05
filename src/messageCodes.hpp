@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   messageCodes.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/16 10:27:02 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/05 01:21:11 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/05 04:53:29 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,5 +57,6 @@
 #define CHANOPRIVSNEEDED "482"
 #define UMODEUNKNOWNFLAG "501"
 #define ERR_KEYSET "467"
+#define RPL_UMODEIS "221"
 
 #endif

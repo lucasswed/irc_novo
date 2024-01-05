@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 16:52:20 by ralves-g          #+#    #+#             */
-/*   Updated: 2024/01/04 17:39:05 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/05 05:21:01 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,5 +192,17 @@ void Channel::messageAll(std::string msg, int senderFd)
 		if (*it == senderFd)
 			continue;
 		Manager::sendMessage(msg, *it);
+	}
+}
+
+void Channel::removeOperator(int fd)
+{
+	for (std::vector<int>::iterator itr = _operators.begin(); _operators.empty() && itr != _operators.end(); itr++)
+	{
+		if (itr != _operators.end() && *itr == fd)
+		{
+			_operators.erase(itr);
+			break ;
+		}
 	}
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 16:52:15 by ralves-g          #+#    #+#             */
-/*   Updated: 2024/01/04 16:02:02 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2024/01/05 05:19:19 by pcampos-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,8 @@ public:
 	// msgs
 	void messageAll(std::string msg);
 	void messageAll(std::string msg, int senderFd);
+
+	void removeOperator(int fd);
 };
 
 #endif
