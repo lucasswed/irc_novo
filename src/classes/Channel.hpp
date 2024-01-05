@@ -6,7 +6,7 @@
 /*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/19 16:52:15 by ralves-g          #+#    #+#             */
-/*   Updated: 2024/01/05 05:05:16 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/05 05:56:52 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,8 @@ public:
 	// msgs
 	void messageAll(std::string msg);
 	void messageAll(std::string msg, int senderFd);
+
+	void removeOperator(int fd);
 };
 
 #endif

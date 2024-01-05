@@ -6,7 +6,7 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/20 16:39:01 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/04 23:02:44 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2024/01/05 01:29:32 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ bool Server::existCommand(std::string const &cmd)
 
 void Server::runCmd(Client &client)
 {
-	std::cout << BLUE << "Running command..." << client.getCmd()[0] << RESET << std::endl;
+	std::cout << BLUE << "Running command..." << RESET << std::endl;
 	std::string cmd = toUP(client.getCmd()[0]);
 	if (client.getCmd().size() == 0 || client.getCmd()[0].empty())
 		return;
