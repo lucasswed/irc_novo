@@ -6,7 +6,7 @@
 /*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/16 10:27:02 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/03 18:55:41 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/04 23:02:08 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #define LUSEROP "252"
 #define LUSERUNKNOWN "253"
 #define LUSERCHANNELS "254"
+#define RPL_ENDOFWHO "315"
 #define RPL_LISTSTART "321"
 #define RPL_LIST "322"
 #define RPL_LISTEND "323"
@@ -53,6 +54,5 @@
 #define NOPRIVILEGES "481"
 #define CHANOPRIVSNEEDED "482"
 #define UMODEUNKNOWNFLAG "501"
-#define RPL_ENDOFWHO "315"
 
 #endif

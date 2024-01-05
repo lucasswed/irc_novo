@@ -6,7 +6,7 @@
 /*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:13:17 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/04 17:38:43 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/04 23:19:18 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -530,21 +530,40 @@ void Manager::nickCmd(Client &client)
 	client.setNickname(cmd[1]);
 }
 
-void Manager::privmsgCmd(Client &client)
+void Manager::msgToChannel(std::string channelName, std::string msg, Client &client) {
+	(void)client;
+	for (size_t i = 0; i < getChnlByName(channelName)->getMembers().size(); i++)
+	{
+		// if (getChnlByName(channelName)->getMembers()[i] != client.getFd())
+			sendMessage(formatMessage(*getClientByFd(getChnlByName(channelName)->getMembers()[i])) + " PRIVMSG " + channelName + " " + msg, getChnlByName(channelName)->getMembers()[i]);
+	}
+}
+
+void Manager::privmsgChannels(std::vector<std::string> const &recipients, std::string msg, Client &client)
 {
-	if (client.getCmd().size() < 2)
-	{
-		sendMessage(formatMessage(client, ERR_NORECIPIENT) + " :No recipient given" + toUP(client.getCmd()[0]), client.getFd());
-	}
-	if (client.getCmd().size() < 3)
-	{
-		sendMessage(formatMessage(client, ERR_NOTEXTTOSEND) + " :No text to send", client.getFd());
-		return;
-	}
-	std::vector<std::string> recipients = ft_split(client.getCmd()[1], ",");
 	for (size_t i = 0; i < recipients.size(); i++)
 	{
-		if (getFdByNick(recipients[i]) == -1)
+		if (_channels.empty() || getChnlByName(recipients[i]) == _channels.end())
+		{
+			sendMessage(formatMessage(client, NOSUCHNICK) + " " + recipients[i] + " :No such nick/channel", client.getFd());
+			continue;
+		}
+		else if (!(getChnlByName(recipients[i])->isMember(client.getFd())))
+		{
+			sendMessage(formatMessage(client, NOTONCHANNEL) + " " + recipients[i] + " :You're not on that channel", client.getFd());
+		}
+		else
+		{
+			msgToChannel(recipients[i], msg, client);
+		}
+	}
+}
+
+void Manager::privmsgClients(std::vector<std::string> const &recipients, std::string msg, Client &client)
+{
+	for (size_t i = 0; i < recipients.size(); i++)
+	{
+		if (_clients.empty() || getFdByNick(recipients[i]) == -1)
 		{
 			sendMessage(formatMessage(client, NOSUCHNICK) + " " + recipients[i] + " :No such nick/channel", client.getFd());
 			continue;
@@ -562,11 +581,51 @@ void Manager::privmsgCmd(Client &client)
 			}
 			else
 			{
-				sendMessage(formatMessage(_clients[i2], client.getCmd()[2]), getFdByNick(recipients[i]));
+				sendMessage(formatMessage(_clients[i2]) + "From \"" + client.getNickname() + "\" " + msg,  getFdByNick(recipients[i]));
 			}
 		}
 	}
 }
+
+void Manager::privmsgCmd(Client &client)
+{
+	std::clog << "Received -> " << std::endl;
+	for (size_t i = 0 ; i < client.getCmd().size(); i++)
+		std::clog << client.getCmd()[i] << std::endl;
+	if (client.getCmd().size() < 2)
+	{
+		sendMessage(formatMessage(client, ERR_NORECIPIENT) + " :No recipient given" + toUP(client.getCmd()[0]), client.getFd());
+	}
+	if (client.getCmd().size() < 3)
+	{
+		sendMessage(formatMessage(client, ERR_NOTEXTTOSEND) + " :No text to send", client.getFd());
+		return;
+	}
+	std::vector<std::string> recipients = ft_split(client.getCmd()[1], ",");
+	std::string flag = recipients[0].size() > 1 && recipients[0][1] == '#' ? "channel" : "client";
+	std::string msg;
+	for (size_t i = 2; i < client.getCmd().size(); i++)
+	{
+		if (i != 2)
+			msg += " ";
+		msg += client.getCmd()[i];
+	}
+	for (size_t i = 0; i < recipients.size(); i++)
+	{
+		if ((flag == "channel" && !(recipients[i].size() > 1 && recipients[i][1] == '#')) ||
+			(flag == "client" && !(recipients[i].size() > 0 && recipients[i][1] != '#')))
+		{
+			sendMessage(formatMessage(client) + " :Wrong parameters", client.getFd());
+			return ;
+		}	
+	}
+	if (flag == "channel")
+		privmsgClients(recipients, msg, client);
+	else
+		privmsgChannels(recipients, msg, client);
+}
+
+
 
 void Manager::modeCmd(Client &client)
 {

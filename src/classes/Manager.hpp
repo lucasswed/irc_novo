@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Manager.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pcampos- <pcampos-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/01/04 17:27:15 by pcampos-         ###   ########.fr       */
+/*   Updated: 2024/01/04 22:35:26 by ralves-g         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,9 @@ public:
 	static int getFdByNick(std::string nickname);
 	static std::string getNickByFd(int fd);
 	static std::map<std::string, cmdFunction> getCmdMap(void);
+	static void privmsgClients(std::vector<std::string> const &recipients, std::string msg, Client &client);
+	static void privmsgChannels(std::vector<std::string> const &recipients, std::string msg, Client &client);
+	static void msgToChannel(std::string channelName, std::string msg, Client &client);
 
 	// Cmd Functions
 	static void joinCmd(Client &client);
