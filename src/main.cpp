@@ -6,12 +6,13 @@
 /*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/15 19:22:33 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/04 14:58:43 by lucas-ma         ###   ########.fr       */
+/*   Updated: 2024/01/05 02:21:14 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "irc.hpp"
 #include "./classes/Server.hpp"
+#include <signal.h>
 
 bool strIsNumber(std::string const &str)
 {
@@ -71,6 +72,10 @@ int main(int ac, char **av)
 		std::cerr << "Right usage: ./ircserv <port> <password>" << std::endl;
 		return (1);
 	}
+
+	// signal(SIGINT, signalHandler);
+	// signal(SIGQUIT, signalHandler);
+	// signal(SIGTERM, signalHandler);
 
 	if (!check_errors(av))
 		return (1);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Manager.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ralves-g <ralves-g@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lucas-ma <lucas-ma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/12 20:13:17 by lucas-ma          #+#    #+#             */
-/*   Updated: 2024/01/05 01:20:26 by ralves-g         ###   ########.fr       */
+/*   Updated: 2024/01/05 05:08:27 by lucas-ma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void Manager::fillMaps(void)
 	onCmd("LIST", &Manager::listCmd);
 	onCmd("LUSERS", &Manager::lusersCmd);
 	onCmd("NICK", &Manager::nickCmd);
-	
+
 	// MODES
 	onMode("INVITE", &Manager::inviteMode);
 	onMode("TOPIC", &Manager::topicMode);
@@ -59,10 +59,58 @@ void Manager::fillMaps(void)
 	onMode("LIMIT", &Manager::limitMode);
 }
 
+void Manager::sendWhoMessage(std::vector<int> list, Client &sender, std::string channelName)
+{
+	for (size_t i = 0; i < list.size(); i++)
+	{
+		Client &client = *Manager::getClientByFd(list[i]);
+		std::string status;
+		if (channelName != "*")
+
+			if (Manager::getChnlByName(channelName)->isOperator(list[i]))
+				status = Manager::getChnlByName(channelName)->isOperator(list[i]) ? "@" : "+";
+		sendMessage(formatMessage(sender, RPL_WHOREPLY) + " " + channelName + " localhost irc.server.gg " + client.getNickname() + " H" + status + " :1" + client.getUsername(), sender.getFd());
+	}
+	sendMessage(formatMessage(sender, RPL_ENDOFWHO) + " " + channelName + " :End of WHO list", sender.getFd());
+}
+
+bool Manager::isValidChannel(std::string const &channelName, Client &client)
+{
+	if (channelName[0] != '#')
+		return (false);
+
+	std::vector<Channel>::iterator channelIt = getChnlByName(channelName);
+	if (channelIt == _channels.end())
+	{
+		sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + channelName + " :No such channel", client.getFd());
+		return (false);
+	}
+
+	return (true);
+}
+
 void Manager::whoCmd(Client &client)
 {
-	(void)client;
-	std::clog << LIGHTPURPLE << "WHO CMD" << RESET << std::endl;
+	std::clog << LIGHTGREEN << "WHO CMD" << RESET << std::endl;
+	if (client.getCmd().size() == 1)
+	{
+		std::vector<int> allClients;
+		for (size_t i = 0; i < _clients.size(); i++)
+			allClients.push_back(_clients[i].getFd());
+		sendWhoMessage(allClients, client, "*");
+		return;
+	}
+	std::vector<std::string> cmd = client.getCmd();
+	if (cmd.size() <= 3 && isValidChannel(cmd[1], client))
+	{
+		Channel &channel = *getChnlByName(cmd[1]);
+		if (cmd.size() == 3 && cmd[2] == "o")
+			sendWhoMessage(channel.getOperators(), client, channel.getName());
+		else
+			sendWhoMessage(channel.getMembers(), client, channel.getName());
+	}
+	else
+		sendMessage(formatMessage(client, UNKNOWNCOMMAND) + " :USAGE: WHO [<channel> [<0>]]", client.getFd());
 }
 
 bool Manager::addClient(int fd)
@@ -534,12 +582,13 @@ void Manager::nickCmd(Client &client)
 	client.setNickname(cmd[1]);
 }
 
-void Manager::msgToChannel(std::string channelName, std::string msg, Client &client) {
+void Manager::msgToChannel(std::string channelName, std::string msg, Client &client)
+{
 	(void)client;
 	for (size_t i = 0; i < getChnlByName(channelName)->getMembers().size(); i++)
 	{
 		// if (getChnlByName(channelName)->getMembers()[i] != client.getFd())
-			sendMessage(formatMessage(*getClientByFd(getChnlByName(channelName)->getMembers()[i])) + " PRIVMSG " + channelName + " " + msg, getChnlByName(channelName)->getMembers()[i]);
+		sendMessage(formatMessage(*getClientByFd(getChnlByName(channelName)->getMembers()[i])) + " PRIVMSG " + channelName + " " + msg, getChnlByName(channelName)->getMembers()[i]);
 	}
 }
 
@@ -585,7 +634,7 @@ void Manager::privmsgClients(std::vector<std::string> const &recipients, std::st
 			}
 			else
 			{
-				sendMessage(formatMessage(_clients[i2]) + "From \"" + client.getNickname() + "\" " + msg,  getFdByNick(recipients[i]));
+				sendMessage(formatMessage(_clients[i2]) + "From \"" + client.getNickname() + "\" " + msg, getFdByNick(recipients[i]));
 			}
 		}
 	}
@@ -594,7 +643,7 @@ void Manager::privmsgClients(std::vector<std::string> const &recipients, std::st
 void Manager::privmsgCmd(Client &client)
 {
 	std::clog << "Received -> " << std::endl;
-	for (size_t i = 0 ; i < client.getCmd().size(); i++)
+	for (size_t i = 0; i < client.getCmd().size(); i++)
 		std::clog << client.getCmd()[i] << std::endl;
 	if (client.getCmd().size() < 2)
 	{
@@ -617,19 +666,17 @@ void Manager::privmsgCmd(Client &client)
 	for (size_t i = 0; i < recipients.size(); i++)
 	{
 		if ((flag == "channel" && !(recipients[i].size() > 1 && recipients[i][1] == '#')) ||
-			(flag == "client" && !(recipients[i].size() > 0 && recipients[i][1] != '#')))
+				(flag == "client" && !(recipients[i].size() > 0 && recipients[i][1] != '#')))
 		{
 			sendMessage(formatMessage(client) + " :Wrong parameters", client.getFd());
-			return ;
-		}	
+			return;
+		}
 	}
 	if (flag == "channel")
 		privmsgClients(recipients, msg, client);
 	else
 		privmsgChannels(recipients, msg, client);
 }
-
-
 
 std::string Manager::checkMode(std::string cmd)
 {
@@ -654,17 +701,18 @@ void Manager::modeCmd(Client &client)
 	if (cmd.size() < 3)
 	{
 		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " MODE :Not enought paramaters", client.getFd());
-		return ;
+		return;
 	}
 	std::string mode = checkMode(cmd[2]);
 	if (mode.size() == 0)
 	{
 		sendMessage(formatMessage(client, UMODEUNKNOWNFLAG) + cmd[2] + " :Unknown mode", client.getFd());
-		return ;	if (cmd.size() < 3)
-	{
-		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " MODE :Not enought paramaters", client.getFd());
-		return ;
-	}
+		return;
+		if (cmd.size() < 3)
+		{
+			sendMessage(formatMessage(client, NEEDMOREPARAMS) + " MODE :Not enought paramaters", client.getFd());
+			return;
+		}
 	}
 	_modeMap[mode](client);
 }
@@ -676,17 +724,17 @@ void Manager::inviteMode(Client &client)
 	if (target == _channels.end())
 	{
 		sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + client.getCmd()[1] + " :No such channel", client.getFd());
-		return ;
+		return;
 	}
-	if(!target->isMember(client.getFd()))
+	if (!target->isMember(client.getFd()))
 	{
 		sendMessage(formatMessage(client, NOTONCHANNEL) + " " + target->getName() + " :You're not on that channel", client.getFd());
-		return ;
+		return;
 	}
 	if (!target->isOperator(client.getFd()))
 	{
 		sendMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + target->getName() + " :You're not channel operator", client.getFd());
-		return ;
+		return;
 	}
 	if (cmd[2][0] == '-')
 	{
@@ -707,17 +755,17 @@ void Manager::topicMode(Client &client)
 	if (target == _channels.end())
 	{
 		sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + client.getCmd()[1] + " :No such channel", client.getFd());
-		return ;
+		return;
 	}
-	if(!target->isMember(client.getFd()))
+	if (!target->isMember(client.getFd()))
 	{
 		sendMessage(formatMessage(client, NOTONCHANNEL) + " " + target->getName() + " :You're not on that channel", client.getFd());
-		return ;
+		return;
 	}
 	if (!target->isOperator(client.getFd()))
 	{
 		sendMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + target->getName() + " :You're not channel operator", client.getFd());
-		return ;
+		return;
 	}
 	if (cmd[2][0] == '-')
 	{
@@ -737,23 +785,23 @@ void Manager::keyMode(Client &client)
 	if (cmd.size() < 4 && cmd[2][0] != '-')
 	{
 		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " MODE :Not enought paramaters", client.getFd());
-		return ;
+		return;
 	}
 	std::vector<Channel>::iterator target = getChnlByName(cmd[1]);
 	if (target == _channels.end())
 	{
 		sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + client.getCmd()[1] + " :No such channel", client.getFd());
-		return ;
+		return;
 	}
-	if(!target->isMember(client.getFd()))
+	if (!target->isMember(client.getFd()))
 	{
 		sendMessage(formatMessage(client, NOTONCHANNEL) + " " + target->getName() + " :You're not on that channel", client.getFd());
-		return ;
+		return;
 	}
 	if (!target->isOperator(client.getFd()))
 	{
 		sendMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + target->getName() + " :You're not channel operator", client.getFd());
-		return ;
+		return;
 	}
 	if (cmd[2][0] == '-')
 	{
@@ -765,7 +813,7 @@ void Manager::keyMode(Client &client)
 		if (target->getMode("KEY"))
 		{
 			sendMessage(formatMessage(client, ERR_KEYSET) + " " + target->getName() + " :Channel key already set", client.getFd());
-			return ;
+			return;
 		}
 		target->setMode("KEY", true);
 		target->setKey(cmd[3]);
@@ -779,23 +827,23 @@ void Manager::limitMode(Client &client)
 	if (cmd.size() < 4 && cmd[2][0] != '-')
 	{
 		sendMessage(formatMessage(client, NEEDMOREPARAMS) + " MODE :Not enought paramaters", client.getFd());
-		return ;
+		return;
 	}
 	std::vector<Channel>::iterator target = getChnlByName(cmd[1]);
 	if (target == _channels.end())
 	{
 		sendMessage(formatMessage(client, ERR_NOSUCHCHANNEL) + " " + client.getCmd()[1] + " :No such channel", client.getFd());
-		return ;
+		return;
 	}
-	if(!target->isMember(client.getFd()))
+	if (!target->isMember(client.getFd()))
 	{
 		sendMessage(formatMessage(client, NOTONCHANNEL) + " " + target->getName() + " :You're not on that channel", client.getFd());
-		return ;
+		return;
 	}
 	if (!target->isOperator(client.getFd()))
 	{
 		sendMessage(formatMessage(client, CHANOPRIVSNEEDED) + " " + target->getName() + " :You're not channel operator", client.getFd());
-		return ;
+		return;
 	}
 	if (cmd[2][0] == '-')
 	{
